@@ -1,24 +1,23 @@
 
 
 Requirements:
-- Search for chatroom's
+- Search for chatroom's x
 - Share chatroom's
-- Ability to create chatroom's
-- Ability to join chatroom's
-- Ability to leave chatroom's
+- Ability to create chatroom's x
+- Ability to join chatroom's x
+- Ability to leave chatroom's x
 - Allow various media in the chatroom's
     - Text
     - Photos
     - Files
-    - Polls
     - Geo location
         - Embedded map with a button to request directions to the given location
         - User sharing the location should be able to select a location on a map, searching an address or using the current location
 
-- Users should have a username (mutable?)
-- Easy access to joined chatroom's list
-    - Notification of unread messages (counted?)
-- Generic notification system
+- Users should have a username (mutable?) x
+- Easy access to joined chatroom's list x
+    - Notification of unread messages (counted?) x
+- Generic notification system x
 
 - Take into account sustainability and resource saving
 

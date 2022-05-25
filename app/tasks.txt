@@ -1,9 +1,50 @@
 
+# before making the screens. Do this setup. Have a mock main page just to ensure it all works
+TODO: (B) Create Firebase Collections
+TODO: (O) Integrate application with firebase []
 
+# at this point, have a simple main app screen. Used to ensure the bellow impl. work
+TODO: (O) Investigate and implement l10n []
+TODO: (O) Investigate and implement theming []
 
+# create the pages with the theming and translations
+TODO: (F) Create Login Page []
+TODO: (F) Create Main Page with ACTIVE Chat Room List []
+TODO: (F) Create Page to choose a Chat Room to join (list) []
+TODO: (F) Create Page of Chat Room (not functional) []
+TODO: (O) Implement Global User State (username must be unique - and kept as global state for the app) []
+Have all the pages communicate with firebase
 
+# have some logic with the firebase and creating and adding things
+TODO: (F) Implement Creation of Chat Rooms []
+TODO: (F) Implement the ability to join Chat Rooms []
+TODO: (F) Implement the ability to leave Chat Rooms []
 
-TODO: Integrate application with firebase []
-TODO: Investigate and implement theming []
-TODO: Investigate and implement l10n
+# chat room logic
+TODO: (F) Implement read and send messages on a chat room []
+TODO: (F) Implement load of previous messages (pagination, infinite scrolling)
+TODO: (O) Implement Caching of messages (local storage) - if chatroom has notification, you should get new data from db and update cache, otherwise just use cache data []
 
+# Notification timeeee
+TODO: (F) Implement Notifications []
+- When a room gets a new message for each USER in chat room -> create UserNotification with user_id ChatRoom::id
+- When you enter Main Page -> firebase.get(UserNotification).where(user_id == my_user_id)
+- For each result, append that information to the chat room object on list
+- When you enter chat room, clear the firebase.get(UserNotification).where(user_id == my_user_id && chat_room_id == ChatRoom::id)
+TODO: (O) Implement Firebase Notifications []
+
+# Search and New media
+TODO: (F) Implement Search feature on Chat Room Page []
+TODO: (F) Implement Photos in chat []
+TODO: (O) Implement Caching of images with LRU
+TODO: (F) Implement Embedded map that allows you to select a location, search an address or uses phone current location and send the result on the chat with a different media type []
+TODO: (F) Implement Open Map on Google Maps of the location in the message []
+
+# Chat Room Privacy
+TODO: (F) Android App Link to join the chatroom (private chat rooms) []
+TODO: (F) Creating a Chat Room in Geo-fence style, we must pick a point (on map, address or using current location) and a radius - allow users only in that radius to join []
+TODO: (F) Leaving the Geofence makes the chat room unavailable - Entering it again, makes it available []
+
+# Wifi Usage
+TODO: (O) Try to preload everything when we are on WIFI []
+TODO: (O) Use bad quality of images on data []
