@@ -26,8 +26,8 @@ import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MyActivity";
-    private static final String EXTRA_OBJECT = "extra_object";
+    private static final String TAG = "Main Activity";
+    private static final String USER_OBJECT = "user_object";
     private String username = "";
 
     @Override
@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         DocumentSnapshot document = task.getResult();
                                         assert document != null;
-                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                        Log.d(TAG, document.getId() + " => " + document.get("lastAccess"));
                                         Intent intent = new Intent(context, HomeActivity.class);
-                                        intent.putExtra(EXTRA_OBJECT, document.getId());
+                                        intent.putExtra(USER_OBJECT, document.getId());
                                         startActivity(intent);
 
                                     }

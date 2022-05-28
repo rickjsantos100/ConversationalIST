@@ -2,21 +2,24 @@ package pt.ulisboa.tecnico.cmov.conversationalist.models;
 
 import com.google.firebase.firestore.DocumentId;
 
-public class User {
+import java.util.ArrayList;
+import java.util.List;
 
+public class User {
+    private final List<Chatroom> chatrooms;
     //    Hidden firestore id field
     @DocumentId
     private String username;
     private Long lastAccess;
-    private Chatroom[] chatrooms;
 
-    public User(Long lastAccess, Chatroom[] chatrooms) {
+    public User(Long lastAccess, List<Chatroom> chatrooms) {
         this.lastAccess = lastAccess;
         this.chatrooms = chatrooms;
     }
 
     public User(Long lastAccess) {
         this.lastAccess = lastAccess;
+        this.chatrooms = new ArrayList<>();
     }
 
     public Long getLastAccess() {
