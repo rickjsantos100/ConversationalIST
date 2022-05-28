@@ -1,32 +1,34 @@
 package pt.ulisboa.tecnico.cmov.conversationalist;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.inputmethod.EditorInfo;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
+
+import java.util.Objects;
+
+import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MyActivity";
     private static final String EXTRA_OBJECT = "extra_object";
+    private String username = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,73 +36,55 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference usersCollection =  db.collection("users");
+        CollectionReference usersCollection = db.collection("users");
 
         EditText usernameField = findViewById(R.id.username);
 
-        usernameField.setOnEditorActionListener(new TextView.OnEditorActionListener(){
+        Button btnLogin = findViewById(R.id.btn_login);
+
+        Activity context = this;
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                String username = usernameField.getText().toString();
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    usersCollection.document(username)
-                            .set(new User(System.currentTimeMillis()), SetOptions.merge()).addOnSuccessListener(
-                                    new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void nothing) {
+            public void onClick(View view) {
+                // Add document data with auto-generated id.
+                username = usernameField.getText().toString();
 
-                                            usersCollection.whereEqualTo("id", username).limit(1).get()
-                                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                            if (task.isSuccessful()) {
-                                                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                                                    Log.d(TAG, document.getId() + " => " + document.getData());
-//                                                                    Intent intent = new Intent(this, HomeActivity.class);
-//                                                                    intent.putExtra(EXTRA_OBJECT,document.getData() );
-//                                                                    startActivity(intent);
-
-                                                                }
-                                                            } else {
-                                                                Log.d(TAG, "Error getting documents: ", task.getException());
-                                                            }
-                                                        }
-                                                    });
-
-
-
-                                        }
-                                    });
-
-                    return true;
+                if (username.equals("")) {
+                    return;
                 }
-                return false;
+
+
+                usersCollection.document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && Objects.requireNonNull(task.getResult()).exists()) {
+                            Log.w(TAG, "Document already exists");
+                        } else {
+                            usersCollection.document(username).set(new User(System.currentTimeMillis())).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        assert document != null;
+                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                        Intent intent = new Intent(context, HomeActivity.class);
+                                        intent.putExtra(EXTRA_OBJECT, document.getId());
+                                        startActivity(intent);
+
+                                    }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error adding document", e);
+                                }
+                            });
+                        }
+                    }
+                });
             }
         });
-
-        // Create a new user with a first and last name
-//        Map<String, Object> user = new HashMap<>();
-//        user.put("first", "Ada");
-//        user.put("last", "Lovelace");
-//        user.put("born", 1815);
-//
-//        // Add a new document with a generated ID
-//        db.collection("users")
-//                .add(user)
-//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                    @Override
-//                    public void onSuccess(DocumentReference documentReference) {
-//                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.w(TAG, "Error adding document", e);
-//                    }
-//                });
-
-
 //        Read data example
 //        db.collection("users")
 //                .get()
