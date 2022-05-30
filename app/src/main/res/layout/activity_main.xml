@@ -25,7 +25,7 @@
         android:layout_width="222dp"
         android:layout_height="87dp"
         android:ems="10"
-        android:hint="username"
+        android:hint="@string/username"
         android:imeOptions="actionDone"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
