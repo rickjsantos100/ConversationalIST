@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">ConversationalIST</string>
     <string name="username">Username</string>
+    <string name="message">Message</string>
+    <string name="login" translatable="false">Login</string>
+    <string name="select_chatroom">Select Chatroom</string>
 
 </resources>

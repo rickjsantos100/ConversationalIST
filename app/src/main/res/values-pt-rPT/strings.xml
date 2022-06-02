@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="username">Usuário</string>
+    <string name="message">Mensagem</string>
+    <string name="select_chatroom">Selecione Sala</string>
 </resources>

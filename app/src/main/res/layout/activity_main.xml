@@ -4,46 +4,70 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@color/ist_gray"
     tools:context=".activities.MainActivity">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="221dp"
-        android:layout_height="146dp"
-        android:gravity="center"
-        android:text="ConversationalIST"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/userLetter"
+        android:layout_width="35sp"
+        android:layout_height="35sp"
+        android:layout_marginStart="16sp"
+        android:layout_marginTop="16sp"
+        android:textSize="35sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.109" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/username"
-        android:layout_width="222dp"
-        android:layout_height="87dp"
-        android:ems="10"
-        android:hint="@string/username"
-        android:imeOptions="actionDone"
-        android:inputType="textPersonName"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_marginTop="16sp"
+        android:background="@drawable/background_content_bottom"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.23" />
+        app:layout_constraintTop_toBottomOf="@id/userLetter"
 
-    <Button
-        android:id="@+id/btn_login"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/newRoom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="login"
+        android:layout_marginEnd="24sp"
+        android:layout_marginBottom="24sp"
+        android:backgroundTint="@color/ist_blue"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username"
-        app:layout_constraintVertical_bias="0.216" />
+        app:tint="@color/white" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imgsignOut"
+        android:layout_width="30sp"
+        android:layout_height="30sp"
+        android:layout_marginTop="16sp"
+        android:layout_marginEnd="16sp"
+        android:background="@drawable/background_icon"
+        android:padding="6sp"
+        android:src="@drawable/ic_power"
+        android:tint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8sp"
+        android:layout_marginEnd="8sp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/userLetter"
+        app:layout_constraintEnd_toStartOf="@id/imgsignOut"
+        app:layout_constraintStart_toEndOf="@+id/userLetter"
+        app:layout_constraintTop_toTopOf="@+id/userLetter" />
 </androidx.constraintlayout.widget.ConstraintLayout>

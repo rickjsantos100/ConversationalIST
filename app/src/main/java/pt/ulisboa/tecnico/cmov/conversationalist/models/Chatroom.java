@@ -2,15 +2,16 @@ package pt.ulisboa.tecnico.cmov.conversationalist.models;
 
 import com.google.firebase.firestore.DocumentId;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Chatroom {
+public class Chatroom implements Serializable {
     @DocumentId
-    private String name;
-    private boolean isPrivate;
-    private User admin;
-    private String region;
-    private List<User> users;
-    private List<Message> messages;
+    public String name;
+    public boolean isPrivate;
+    public User admin;
+    public String region;
+    public List<User> users;
+    public List<Message> messages;
 
 }

@@ -14,27 +14,26 @@ import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    public static final int VIEW_TYPE_SENT = 1;
+    public static final int VIEW_TYPE_RECEIVED = 2;
     private final List<Message> messages;
 
     public ChatAdapter(List<Message> messages) {
         this.messages = messages;
     }
 
-    public static final int VIEW_TYPE_SENT = 1;
-    public static final int VIEW_TYPE_RECEIVED = 2;
-
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if(viewType == VIEW_TYPE_SENT) {
+        if (viewType == VIEW_TYPE_SENT) {
             return new SentMessageViewHolder(
                     ItemContainerSentMessageBinding.inflate(
-                        LayoutInflater.from(parent.getContext()),
-                        parent,
-                        false
+                            LayoutInflater.from(parent.getContext()),
+                            parent,
+                            false
                     )
             );
-        }else {
+        } else {
             return new ReceivedMessageViewHolder(
                     ItemContainerReceivedMessageBinding.inflate(
                             LayoutInflater.from(parent.getContext()),
@@ -47,9 +46,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if(getItemViewType(position) == VIEW_TYPE_SENT) {
+        if (getItemViewType(position) == VIEW_TYPE_SENT) {
             ((SentMessageViewHolder) holder).setData(messages.get(position));
-        }else {
+        } else {
             ((ReceivedMessageViewHolder) holder).setData(messages.get(position));
         }
     }
@@ -61,9 +60,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        if(position == 0) { // Refactor to check if this corresponds to the user that's currently logged in
+        if (position == 0) { // Refactor to check if this corresponds to the user that's currently logged in
             return VIEW_TYPE_SENT;
-        }else {
+        } else {
             return VIEW_TYPE_RECEIVED;
         }
     }

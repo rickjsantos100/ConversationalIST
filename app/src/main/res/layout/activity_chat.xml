@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="#46555f"
+    android:background="@color/ist_gray"
 
     tools:context=".activities.ChatActivity">
-    
+
     <View
         android:id="@+id/viewBackground"
         android:layout_width="match_parent"
@@ -17,12 +17,12 @@
         android:background="@drawable/ic_chat_background_top"
         app:layout_constraintBottom_toTopOf="@+id/layoutSend"
         app:layout_constraintTop_toTopOf="parent" />
-    
+
     <View
         android:id="@+id/headerBackground"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="#46555f"
+        android:background="@color/ist_gray"
         app:layout_constraintBottom_toTopOf="@id/viewSupporter"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -31,13 +31,12 @@
         android:layout_width="30sp"
         android:layout_height="30sp"
         android:layout_marginStart="16sp"
-        android:layout_marginLeft="16sp"
         android:layout_marginTop="12sp"
         android:padding="2sp"
         android:src="@drawable/ic_chat_back_btn"
-        app:tint="@color/white"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageMore"
@@ -45,12 +44,11 @@
         android:layout_height="30sp"
         android:layout_marginTop="12sp"
         android:layout_marginEnd="16sp"
-        android:layout_marginRight="16sp"
         android:padding="2sp"
         android:src="@drawable/ic_chat_more_btn"
-        app:tint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
 
     <TextView
         android:id="@+id/textName"
@@ -68,13 +66,13 @@
         app:layout_constraintEnd_toStartOf="@id/imageMore"
         app:layout_constraintStart_toEndOf="@id/imageBack"
         app:layout_constraintTop_toTopOf="@id/imageBack" />
-    
+
     <View
         android:id="@+id/viewSupporter"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="12sp"
-        app:layout_constraintTop_toBottomOf="@id/imageBack"/>
+        app:layout_constraintTop_toBottomOf="@id/imageBack" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecyclerView"
@@ -87,7 +85,7 @@
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="@id/viewBackground"
-        app:layout_constraintTop_toBottomOf="@id/viewSupporter"/>
+        app:layout_constraintTop_toBottomOf="@id/viewSupporter" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -103,7 +101,6 @@
         android:layout_width="40sp"
         android:layout_height="40sp"
         android:layout_marginEnd="16sp"
-        android:layout_marginRight="16sp"
         android:layout_marginBottom="12sp"
         android:background="@drawable/ic_chat_input_background"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -113,31 +110,28 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="4sp"
-            android:layout_marginLeft="4sp"
             android:padding="8sp"
             android:src="@drawable/ic_chat_send_button"
             app:tint="@color/white" />
 
     </FrameLayout>
-    
+
     <EditText
         android:id="@+id/inputMessage"
         android:layout_width="0dp"
         android:layout_height="40sp"
         android:layout_marginStart="16sp"
-        android:layout_marginLeft="16sp"
         android:layout_marginEnd="8sp"
-        android:layout_marginRight="8sp"
         android:layout_marginBottom="12sp"
         android:background="@drawable/ic_chat_input_background"
-        android:hint="Message"
+        android:hint="@string/message"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:inputType="text"
         android:paddingStart="16sp"
         android:paddingEnd="16sp"
         android:textColor="@color/white"
-        android:textColorHint="#A9A9A9"
+        android:textColorHint="@color/hint_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/layoutSend"
         app:layout_constraintStart_toStartOf="parent" />
