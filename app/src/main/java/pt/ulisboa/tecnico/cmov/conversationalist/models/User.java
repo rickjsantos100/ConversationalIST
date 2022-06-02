@@ -30,7 +30,6 @@ public class User {
         this.lastAccess = lastAccess;
     }
 
-
     public String getUsername() {
         return username;
     }

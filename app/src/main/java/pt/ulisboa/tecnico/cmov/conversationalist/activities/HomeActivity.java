@@ -1,9 +1,11 @@
-package pt.ulisboa.tecnico.cmov.conversationalist;
+package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import pt.ulisboa.tecnico.cmov.conversationalist.R;
 
 public class HomeActivity extends AppCompatActivity {
 

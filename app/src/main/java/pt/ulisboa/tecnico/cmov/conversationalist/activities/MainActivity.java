@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.conversationalist;
+package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 
+import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 
 
