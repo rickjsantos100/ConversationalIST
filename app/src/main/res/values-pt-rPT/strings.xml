@@ -3,4 +3,6 @@
     <string name="username">Usuário</string>
     <string name="message">Mensagem</string>
     <string name="select_chatroom">Selecione Sala</string>
+    <string name="welcome_back">Bem Vindo!</string>
+    <string name="login_to_continue">Login para Continuar</string>
 </resources>

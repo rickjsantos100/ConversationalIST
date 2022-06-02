@@ -3,6 +3,7 @@
     <color name="ist_blue">#009de0</color>
     <color name="ist_gray">#46555f</color>
     <color name="hint_text">#A9A9A9</color>
+    <color name="background_input">#CDCDCD</color>
     <color name="red">#EC0000</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
