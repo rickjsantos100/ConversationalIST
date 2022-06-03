@@ -2,15 +2,30 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatroomAdapter;
+import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityChatroomBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityMainBinding;
+import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
+import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
+import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ChatroomListener {
 
     private ActivityMainBinding binding;
     private PreferenceManager preferenceManager;
@@ -21,9 +36,9 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         preferenceManager = new PreferenceManager(getApplicationContext());
-
         loadUserDetails();
         setListeners();
+        getUserChatrooms();
     }
 
     private void setListeners() {
@@ -42,6 +57,57 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
+    private void getUserChatrooms() {
+        loading(true);
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+
+        String username = preferenceManager.getString("username");
+        Task<DocumentSnapshot> user = database.collection("users").document(username).get();
+
+        database.collection("chats").whereEqualTo("sender", user).get().addOnCompleteListener(task -> {
+            if(task.isSuccessful() && task.getResult() != null) {
+                List<Message> messages = new ArrayList<>();
+                List<Chatroom> chatrooms = new ArrayList<>();
+
+                for (QueryDocumentSnapshot q : task.getResult()) {
+                    Message message = new Message();
+                    message.chatroom = q.getString("chatroom");
+                    messages.add(message);
+                }
+
+                for (Message m : messages) {
+                    Chatroom chatroom = new Chatroom();
+                    chatroom.name = m.getChatroom();
+                    if (!chatrooms.contains(chatroom)) {
+                        chatrooms.add(chatroom);
+                    }
+                }
+
+                if (chatrooms.size() > 0) {
+                    ChatroomAdapter chatroomAdapter = new ChatroomAdapter(chatrooms, this);
+                    binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+                    binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+    private void loading(Boolean isLoading) {
+        if (isLoading) {
+            ActivityChatroomBinding.inflate(getLayoutInflater()).progressBar.setVisibility(View.VISIBLE);
+
+        } else {
+            ActivityChatroomBinding.inflate(getLayoutInflater()).progressBar.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onChatroomClicked(Chatroom chatroom) {
+        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        intent.putExtra("chatroom", chatroom);
+        startActivity(intent);
+        finish();
+    }
 
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {

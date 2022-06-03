@@ -90,15 +90,17 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage() {
-        HashMap<String, Object> message = new HashMap<>();
-        message.put("sender", preferenceManager.getString("username"));
-        message.put("chatroom", chatroom.name);
-        message.put("value", binding.inputMessage.getText().toString());
-        message.put("timestamp", new Date());
+        if (!binding.inputMessage.getText().toString().matches("")) {
+            HashMap<String, Object> message = new HashMap<>();
+            message.put("sender", preferenceManager.getString("username"));
+            message.put("chatroom", chatroom.name);
+            message.put("value", binding.inputMessage.getText().toString());
+            message.put("timestamp", new Date());
 
-        db.collection("chats").add(message);
+            db.collection("chats").add(message);
 
-        binding.inputMessage.setText(null);
+            binding.inputMessage.setText(null);
+        }
     }
 
     private void setListeners() {

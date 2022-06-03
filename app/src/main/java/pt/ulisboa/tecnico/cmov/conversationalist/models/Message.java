@@ -26,5 +26,7 @@ public class Message implements Serializable {
         this.chatroom = "";
     }
 
-
+    public String getChatroom() {
+        return this.chatroom;
+    }
 }
