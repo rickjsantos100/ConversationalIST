@@ -25,8 +25,4 @@ public class Message implements Serializable {
         this.timestamp = new Date();
         this.chatroom = "";
     }
-
-    public String getChatroom() {
-        return this.chatroom;
-    }
 }

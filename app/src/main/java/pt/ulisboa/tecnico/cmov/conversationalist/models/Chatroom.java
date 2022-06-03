@@ -13,4 +13,12 @@ public class Chatroom implements Serializable {
     public String region;
     public List<Message> messages;
 
+    @Override
+    public boolean equals(Object other)
+    {
+        if (!(other instanceof Chatroom))
+            return false;
+        Chatroom p = (Chatroom) other;
+        return p.name.equals(this.name);
+    }
 }

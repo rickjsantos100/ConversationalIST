@@ -62,10 +62,10 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
         FirebaseFirestore database = FirebaseFirestore.getInstance();
 
         String username = preferenceManager.getString("username");
-        Task<DocumentSnapshot> user = database.collection("users").document(username).get();
 
-        database.collection("chats").whereEqualTo("sender", user).get().addOnCompleteListener(task -> {
+        database.collection("chats").whereEqualTo("sender", username).get().addOnCompleteListener(task -> {
             if(task.isSuccessful() && task.getResult() != null) {
+                loading(false);
                 List<Message> messages = new ArrayList<>();
                 List<Chatroom> chatrooms = new ArrayList<>();
 
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
 
                 for (Message m : messages) {
                     Chatroom chatroom = new Chatroom();
-                    chatroom.name = m.getChatroom();
+                    chatroom.name = m.chatroom;
                     if (!chatrooms.contains(chatroom)) {
                         chatrooms.add(chatroom);
                     }
@@ -94,10 +94,10 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
 
     private void loading(Boolean isLoading) {
         if (isLoading) {
-            ActivityChatroomBinding.inflate(getLayoutInflater()).progressBar.setVisibility(View.VISIBLE);
+            binding.progressBar.setVisibility(View.VISIBLE);
 
         } else {
-            ActivityChatroomBinding.inflate(getLayoutInflater()).progressBar.setVisibility(View.INVISIBLE);
+            binding.progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra("chatroom", chatroom);
         startActivity(intent);
-        finish();
     }
 
 //    @Override
