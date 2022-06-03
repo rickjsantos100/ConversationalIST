@@ -67,7 +67,8 @@ public class ChatActivity extends AppCompatActivity {
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         preferenceManager = new PreferenceManager(getApplicationContext());
-        messages = new ArrayList<>();
+        messages = new ArrayList<Message>();
+
         chatAdapter = new ChatAdapter(
                 messages,
                 preferenceManager.getString("username")

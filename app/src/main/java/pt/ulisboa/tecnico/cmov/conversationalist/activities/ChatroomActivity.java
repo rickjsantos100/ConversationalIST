@@ -48,6 +48,7 @@ public class ChatroomActivity extends AppCompatActivity implements ChatroomListe
             if (task.isSuccessful() && task.getResult() != null) {
                 List<Chatroom> chatrooms = new ArrayList<>();
                 //TODO: iterate over the rooms that the user already belongs and remove those from here
+                //TODO: Find a way to use the @documentId notation to directly cast to list
                 for (QueryDocumentSnapshot q : task.getResult()) {
                     Chatroom chatroom = new Chatroom();
                     chatroom.name = q.getString("name");

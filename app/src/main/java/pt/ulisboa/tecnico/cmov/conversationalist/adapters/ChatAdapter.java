@@ -79,7 +79,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
+
             binding.textMessage.setText(message.value);
+//            TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
+            binding.textDateTime.setText(message.timestamp.getHours() + ":"+  message.timestamp.getMinutes());
         }
     }
 
@@ -93,7 +96,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         void setData(Message message) {
             binding.textMessage.setText(message.value);
-            binding.textDateTime.setText(message.timestamp.toString());
+//            TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
+            binding.textDateTime.setText(message.timestamp.getHours() + ":"+  message.timestamp.getMinutes());
         }
     }
 }

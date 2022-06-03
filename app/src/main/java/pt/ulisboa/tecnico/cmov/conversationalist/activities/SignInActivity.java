@@ -46,6 +46,7 @@ public class SignInActivity extends AppCompatActivity {
                 FirebaseFirestore database = FirebaseFirestore.getInstance();
                 database.collection("users").document(username).get().addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() == null) {
+//                        TODO: Evaluate necessity, should this page just be composed of a nick name insertion
                         loading(false);
                         Toast.makeText(getApplicationContext(), "Username already exists", Toast.LENGTH_SHORT).show();
                     } else {
