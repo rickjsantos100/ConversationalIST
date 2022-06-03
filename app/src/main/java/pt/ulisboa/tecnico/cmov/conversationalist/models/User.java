@@ -7,20 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Serializable {
-    private final List<Chatroom> chatrooms;
+
     //    Hidden firestore id field
     @DocumentId
     private String username;
     private Long lastAccess;
 
-    public User(Long lastAccess, List<Chatroom> chatrooms) {
-        this.lastAccess = lastAccess;
-        this.chatrooms = chatrooms;
-    }
-
     public User(Long lastAccess) {
         this.lastAccess = lastAccess;
-        this.chatrooms = new ArrayList<>();
     }
 
     public Long getLastAccess() {

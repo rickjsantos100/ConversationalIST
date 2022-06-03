@@ -58,7 +58,7 @@
                 android:id="@+id/buttonSignIn"
                 android:layout_width="match_parent"
                 android:layout_height="50sp"
-                android:text="@string/common_signin_button_text"
+                android:text="@string/login"
                 android:textColor="@color/white"
                 android:textSize="13sp"
                 android:textStyle="bold"

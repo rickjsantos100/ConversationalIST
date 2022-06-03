@@ -11,7 +11,6 @@ public class Chatroom implements Serializable {
     public boolean isPrivate;
     public User admin;
     public String region;
-    public List<User> users;
     public List<Message> messages;
 
 }

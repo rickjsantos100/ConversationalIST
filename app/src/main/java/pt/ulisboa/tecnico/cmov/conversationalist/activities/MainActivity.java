@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         preferenceManager = new PreferenceManager(getApplicationContext());
+
         loadUserDetails();
         setListeners();
     }
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void signOut() {
         Toast.makeText(getApplicationContext(), "Signing out...", Toast.LENGTH_SHORT).show();
+        preferenceManager.clear();
         startActivity(new Intent(getApplicationContext(), SignInActivity.class));
         finish();
     }

@@ -25,7 +25,15 @@ public class SignInActivity extends AppCompatActivity {
         preferenceManager = new PreferenceManager(getApplicationContext());
         binding = ActivitySignInBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        setListeners();
+
+
+        if(preferenceManager.getString("username") == null) {
+            setListeners();
+        } else {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
     }
 
     private void setListeners() {
@@ -46,7 +54,6 @@ public class SignInActivity extends AppCompatActivity {
                                 // we got a new user and we can start it
                                 DocumentSnapshot document = task.getResult();
                                 assert document != null;
-                                preferenceManager.putBoolean("signedIn", true);
                                 preferenceManager.putString("username", username);
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
