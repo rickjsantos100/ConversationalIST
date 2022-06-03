@@ -16,10 +16,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVED = 2;
-    private final List<Message> messages;
 
-    public ChatAdapter(List<Message> messages) {
+    private final List<Message> messages;
+    private final String senderId;
+
+    public ChatAdapter(List<Message> messages, String senderId) {
         this.messages = messages;
+        this.senderId = senderId;
     }
 
     @NonNull
@@ -60,7 +63,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) { // Refactor to check if this corresponds to the user that's currently logged in
+        if (messages.get(position).senderId.equals(senderId)) { // Refactor to check if this corresponds to the user that's currently logged in
             return VIEW_TYPE_SENT;
         } else {
             return VIEW_TYPE_RECEIVED;
@@ -76,7 +79,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
-            binding.textMessage.setText(message.getValue());
+            binding.textMessage.setText(message.value);
         }
     }
 
@@ -89,7 +92,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
-            binding.textMessage.setText(message.getValue());
+            binding.textMessage.setText(message.value);
+            binding.textDateTime.setText(message.timestamp.toString());
         }
     }
 }

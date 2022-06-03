@@ -2,10 +2,11 @@ package pt.ulisboa.tecnico.cmov.conversationalist.models;
 
 import com.google.firebase.firestore.DocumentId;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
     private final List<Chatroom> chatrooms;
     //    Hidden firestore id field
     @DocumentId

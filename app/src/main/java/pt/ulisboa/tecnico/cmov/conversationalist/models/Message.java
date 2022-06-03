@@ -1,33 +1,30 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.models;
 
-public class Message implements Comparable<Message> {
-    private User sender;
-    private MediaType media;
-    private String value;
-    private long timestamp;
+import java.io.Serializable;
+import java.util.Date;
 
-    public Message(User sender, MediaType media, String value, long timestamp) {
-        this.sender = sender;
+public class Message implements Serializable {
+    public String senderId;
+    public MediaType media;
+    public String value;
+    public Date timestamp;
+    public String chatroom;
+
+    public Message(String senderId, MediaType media, String value, Date timestamp, String chatroom) {
+        this.senderId = senderId;
         this.media = media;
         this.value = value;
         this.timestamp = timestamp;
+        this.chatroom = chatroom;
     }
 
-    public String getValue() {
-        return this.value;
+    public Message() {
+        this.senderId = "";
+        this.media = null;
+        this.value = "";
+        this.timestamp = new Date();
+        this.chatroom = "";
     }
 
-    public long getTimestamp() {
-        return this.timestamp;
-    }
 
-    @Override
-    public int compareTo(Message o) {
-        if(getTimestamp() == o.getTimestamp()) {
-            return 0;
-        }else if(getTimestamp() > o.getTimestamp()) {
-            return 1;
-        }
-        return -1;
-    }
 }

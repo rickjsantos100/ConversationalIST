@@ -1,7 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,10 +14,11 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatroomAdapter;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityChatroomBinding;
+import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
-public class ChatroomActivity extends AppCompatActivity {
+public class ChatroomActivity extends AppCompatActivity implements ChatroomListener {
 
 
     private ActivityChatroomBinding binding;
@@ -52,13 +53,11 @@ public class ChatroomActivity extends AppCompatActivity {
                     chatroom.name = q.getString("name");
                     chatroom.region = q.getString("region");
                     chatrooms.add(chatroom);
-                    Log.d("potato", chatroom.name);
                 }
                 if (chatrooms.size() > 0) {
-                    ChatroomAdapter chatroomAdapter = new ChatroomAdapter(chatrooms);
+                    ChatroomAdapter chatroomAdapter = new ChatroomAdapter(chatrooms, this);
                     binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
                     binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
-                    Log.d("potato", "im right here bro");
                 } else {
                     showErrorMessage();
                 }
@@ -80,5 +79,13 @@ public class ChatroomActivity extends AppCompatActivity {
         } else {
             binding.progressBar.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    public void onChatroomClicked(Chatroom chatroom) {
+        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+        intent.putExtra("chatroom", chatroom);
+        startActivity(intent);
+        finish();
     }
 }
