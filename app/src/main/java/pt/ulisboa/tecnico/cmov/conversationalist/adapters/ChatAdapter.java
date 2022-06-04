@@ -1,7 +1,12 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.adapters;
 
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,10 +84,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
-
             binding.textMessage.setText(message.value);
 //            TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
-            binding.textDateTime.setText(message.timestamp.getHours() + ":"+  message.timestamp.getMinutes());
+            binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":"+  message.timestamp.getMinutes());
         }
     }
 
@@ -97,7 +101,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void setData(Message message) {
             binding.textMessage.setText(message.value);
 //            TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
-            binding.textDateTime.setText(message.timestamp.getHours() + ":"+  message.timestamp.getMinutes());
+            binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":"+  message.timestamp.getMinutes());
         }
     }
 }

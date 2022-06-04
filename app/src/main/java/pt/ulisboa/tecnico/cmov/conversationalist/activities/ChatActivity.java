@@ -90,7 +90,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage() {
-        if (!binding.inputMessage.getText().toString().matches("")) {
+        if (!binding.inputMessage.getText().toString().matches("") && !binding.inputMessage.getText().toString().trim().isEmpty()) {
             HashMap<String, Object> message = new HashMap<>();
             message.put("sender", preferenceManager.getString("username"));
             message.put("chatroom", chatroom.name);
@@ -98,9 +98,8 @@ public class ChatActivity extends AppCompatActivity {
             message.put("timestamp", new Date());
 
             db.collection("chats").add(message);
-
-            binding.inputMessage.setText(null);
         }
+        binding.inputMessage.setText(null);
     }
 
     private void setListeners() {
