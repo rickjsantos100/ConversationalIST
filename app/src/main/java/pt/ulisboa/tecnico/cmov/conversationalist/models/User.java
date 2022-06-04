@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmov.conversationalist.models;
 import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Serializable {
@@ -12,6 +11,7 @@ public class User implements Serializable {
     @DocumentId
     private String username;
     private Long lastAccess;
+    private List<String> chatroomsRefs;
 
     public User(Long lastAccess) {
         this.lastAccess = lastAccess;
@@ -31,5 +31,13 @@ public class User implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public List<String> getChatroomsRefs() {
+        return chatroomsRefs;
+    }
+
+    public void setChatroomsRefs(List<String> chatroomsRefs) {
+        this.chatroomsRefs = chatroomsRefs;
     }
 }

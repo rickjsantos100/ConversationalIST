@@ -10,7 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivitySignInBinding;
+import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
@@ -27,7 +30,7 @@ public class SignInActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
 
-        if(preferenceManager.getString("username") == null) {
+        if(preferenceManager.getUser() == null) {
             setListeners();
         } else {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -50,12 +53,15 @@ public class SignInActivity extends AppCompatActivity {
                         loading(false);
                         Toast.makeText(getApplicationContext(), "Username already exists", Toast.LENGTH_SHORT).show();
                     } else {
-                        database.collection("users").document(username).set(new User(System.currentTimeMillis())).addOnCompleteListener(tt -> {
+                        User newUser = new User(System.currentTimeMillis());
+                        database.collection("users").document(username).set(newUser).addOnCompleteListener(tt -> {
                             if (tt.isSuccessful()) {
                                 // we got a new user and we can start it
                                 DocumentSnapshot document = task.getResult();
                                 assert document != null;
-                                preferenceManager.putString("username", username);
+                                newUser.setUsername(username);
+                                newUser.setChatroomsRefs(new ArrayList<String>());
+                                preferenceManager.setUser(newUser);
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);

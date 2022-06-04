@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
     }
 
     private void loadUserDetails() {
-        binding.textName.setText(preferenceManager.getString("username"));
+        binding.textName.setText(preferenceManager.getUser().getUsername());
     }
 
     private void signOut() {
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
 
-        String username = preferenceManager.getString("username");
+        String username = preferenceManager.getUser().getUsername();
 
         database.collection("chats").whereEqualTo("sender", username).get().addOnCompleteListener(task -> {
             if(task.isSuccessful() && task.getResult() != null) {
@@ -76,8 +76,7 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
                 }
 
                 for (Message m : messages) {
-                    Chatroom chatroom = new Chatroom();
-                    chatroom.name = m.chatroom;
+                    Chatroom chatroom = new Chatroom(m.chatroom);
                     if (!chatrooms.contains(chatroom)) {
                         chatrooms.add(chatroom);
                     }

@@ -68,6 +68,18 @@
             android:textColor="@color/red"
             android:textSize="12sp"
             android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonCreate"
+            android:layout_width="300sp"
+            android:layout_height="50sp"
+            android:layout_gravity="bottom|center"
+            android:layout_marginBottom="15sp"
+            android:text="@string/create_chatroom"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:cornerRadius="8sp" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

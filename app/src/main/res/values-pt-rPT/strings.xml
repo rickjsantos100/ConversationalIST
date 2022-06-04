@@ -5,4 +5,9 @@
     <string name="select_chatroom">Selecione Sala</string>
     <string name="welcome_back">Bem Vindo!</string>
     <string name="login_to_continue">Login para Continuar</string>
+    <string name="create_chatroom">Criar</string>
+    <string name="create_chatroom_dialog_tittle">Criar sala de chat</string>
+    <string name="cancel">Cancelar</string>
+    <string name="chatroom_name">Nome</string>
+    <string name="chatroom_region">Região</string>
 </resources>

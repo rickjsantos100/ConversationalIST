@@ -6,5 +6,9 @@
     <string name="select_chatroom">Select Chatroom</string>
     <string name="welcome_back">Welcome Back!</string>
     <string name="login_to_continue">Login to Continue</string>
-
+    <string name="create_chatroom">Create</string>
+    <string name="create_chatroom_dialog_tittle">Create Chatroom</string>
+    <string name="cancel">Cancel</string>
+    <string name="chatroom_name">Name</string>
+    <string name="chatroom_region">Region</string>
 </resources>

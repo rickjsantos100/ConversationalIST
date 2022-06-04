@@ -3,6 +3,10 @@ package pt.ulisboa.tecnico.cmov.conversationalist.utilities;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.gson.Gson;
+
+import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
+
 public class PreferenceManager {
 
     private final SharedPreferences sharedPreferences;
@@ -30,6 +34,18 @@ public class PreferenceManager {
     public String getString(String key) {
         return sharedPreferences.getString(key, null);
     }
+
+    public void setUser(User user) {
+        Gson gson = new Gson();
+        String serialized_user = gson.toJson(user);
+        putString("user",serialized_user );
+    }
+
+    public User getUser() {
+        Gson gson = new Gson();
+        return gson.fromJson(getString("user"), User.class);
+    }
+
 
     public void clear() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
