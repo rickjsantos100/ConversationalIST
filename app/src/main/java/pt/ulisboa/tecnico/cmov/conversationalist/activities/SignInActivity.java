@@ -33,6 +33,7 @@ public class SignInActivity extends AppCompatActivity {
         if(preferenceManager.getUser() == null) {
             setListeners();
         } else {
+//            TODO: update the stored user with the most recent user information
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
