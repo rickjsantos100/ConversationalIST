@@ -5,33 +5,30 @@ TODO: (O) Integrate application with firebase [x]
 
 # at this point, have a simple main app screen. Used to ensure the bellow impl. work
 TODO: (O) Investigate and implement l10n [x]
-TODO: (O) Investigate and implement theming []
+
 
 # create the pages with the theming and translations
-TODO: (F) Create Login Page []
+TODO: (F) Create Login Page [x]
 TODO: (F) Create Main Page with ACTIVE Chat Room List []
 TODO: (F) Create Page to choose a Chat Room to join (list) []
 TODO: (F) Create Page of Chat Room (not functional) []
-TODO: (O) Implement Global User State (username must be unique - and kept as global state for the app) []
+TODO: (F) Create separator with dates on the chat (opc.) []
 Have all the pages communicate with firebase
 
 # have some logic with the firebase and creating and adding things
-TODO: (F) Implement Creation of Chat Rooms []
-TODO: (F) Implement the ability to join Chat Rooms []
-TODO: (F) Implement the ability to leave Chat Rooms []
+TODO: (F) Implement Creation of Chat Rooms [x]
+
 
 # chat room logic
-TODO: (F) Implement read and send messages on a chat room []
-TODO: (F) Implement load of previous messages (pagination, infinite scrolling)
+TODO: (F) Implement read and send messages on a chat room [x]
+TODO: (F) Implement load of previous messages (pagination, infinite scrolling) []
 TODO: (O) Implement Caching of messages (local storage) - if chatroom has notification, you should get new data from db and update cache, otherwise just use cache data []
 
 # Notification timeeee
-TODO: (F) Implement Notifications []
 - When a room gets a new message for each USER in chat room -> create UserNotification with user_id ChatRoom::id
 - When you enter Main Page -> firebase.get(UserNotification).where(user_id == my_user_id)
 - For each result, append that information to the chat room object on list
 - When you enter chat room, clear the firebase.get(UserNotification).where(user_id == my_user_id && chat_room_id == ChatRoom::id)
-TODO: (O) Implement Firebase Notifications []
 
 # Search and New media
 TODO: (F) Implement Search feature on Chat Room Page []
@@ -48,3 +45,20 @@ TODO: (F) Leaving the Geofence makes the chat room unavailable - Entering it aga
 # Wifi Usage
 TODO: (O) Try to preload everything when we are on WIFI []
 TODO: (O) Use bad quality of images on data []
+
+
+
+# Ricardo
+TODO: Finalize first instance of firebase middleware []
+TODO: (F) Implement the ability to join Chat Rooms []
+TODO: (F) Implement the ability to leave Chat Rooms []
+
+# Lourenço
+TODO: Review logic on the retrieval of the chatrooms []
+TODO: (F) Implement Push Notifications []
+TODO: Quality assurance on home page and search page []
+
+# André
+TODO: (O) Investigate and implement theming []
+TODO: Implement search for chatrooms []
+TODO: Investigate how to send files []
