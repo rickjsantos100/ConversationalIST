@@ -71,7 +71,7 @@ public class ChatActivity extends AppCompatActivity {
 
         chatAdapter = new ChatAdapter(
                 messages,
-                preferenceManager.getString("username")
+                preferenceManager.getUser().getUsername()
         );
         binding.chatRecyclerView.setAdapter(chatAdapter);
         db = FirebaseFirestore.getInstance();
@@ -92,7 +92,7 @@ public class ChatActivity extends AppCompatActivity {
     private void sendMessage() {
         if (!binding.inputMessage.getText().toString().matches("") && !binding.inputMessage.getText().toString().trim().isEmpty()) {
             HashMap<String, Object> message = new HashMap<>();
-            message.put("sender", preferenceManager.getString("username"));
+            message.put("sender", preferenceManager.getUser().getUsername());
             message.put("chatroom", chatroom.name);
             message.put("value", binding.inputMessage.getText().toString());
             message.put("timestamp", new Date());
