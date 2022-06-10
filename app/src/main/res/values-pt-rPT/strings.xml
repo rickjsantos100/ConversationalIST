@@ -10,4 +10,6 @@
     <string name="cancel">Cancelar</string>
     <string name="chatroom_name">Nome</string>
     <string name="chatroom_region">Região</string>
+    <string name="sign_out">Sair</string>
+    <string name="toggle_theme">Mudar Tema</string>
 </resources>

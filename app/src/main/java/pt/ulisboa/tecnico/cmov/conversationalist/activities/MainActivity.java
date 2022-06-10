@@ -2,14 +2,12 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -17,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatroomAdapter;
-import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityChatroomBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityMainBinding;
+import pt.ulisboa.tecnico.cmov.conversationalist.dialogs.CreateChatroomDialogFragment;
 import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
@@ -42,8 +40,11 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
     }
 
     private void setListeners() {
-        binding.imgsignOut.setOnClickListener(v -> signOut());
         binding.newRoom.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), ChatroomActivity.class)));
+        binding.imgsignOut.setOnClickListener(v -> {
+            DialogFragment newFragment = new CreateChatroomDialogFragment();
+            newFragment.show(getSupportFragmentManager(), "create_chatroom");
+        });
     }
 
     private void loadUserDetails() {
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
         String username = preferenceManager.getUser().getUsername();
 
         database.collection("chats").whereEqualTo("sender", username).get().addOnCompleteListener(task -> {
-            if(task.isSuccessful() && task.getResult() != null) {
+            if (task.isSuccessful() && task.getResult() != null) {
                 loading(false);
                 List<Message> messages = new ArrayList<>();
                 List<Chatroom> chatrooms = new ArrayList<>();
