@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -44,6 +45,14 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
         binding.imgsignOut.setOnClickListener(v -> {
             DialogFragment newFragment = new CreateChatroomDialogFragment();
             newFragment.show(getSupportFragmentManager(), "create_chatroom");
+        });
+        binding.imgToggleTheme.setOnClickListener(v -> {
+            if (preferenceManager.getInt("night") == 1) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+            preferenceManager.putInt("night", AppCompatDelegate.getDefaultNightMode());
         });
     }
 

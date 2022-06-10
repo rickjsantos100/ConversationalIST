@@ -25,6 +25,16 @@ public class PreferenceManager {
         return sharedPreferences.getBoolean(key, false);
     }
 
+    public void putInt(String key, int value) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(key, value);
+        editor.apply();
+    }
+
+    public Integer getInt(String key) {
+        return sharedPreferences.getInt(key, 0);
+    }
+
     public void putString(String key, String value) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(key, value);
@@ -35,17 +45,16 @@ public class PreferenceManager {
         return sharedPreferences.getString(key, null);
     }
 
-    public void setUser(User user) {
-        Gson gson = new Gson();
-        String serialized_user = gson.toJson(user);
-        putString("user",serialized_user );
-    }
-
     public User getUser() {
         Gson gson = new Gson();
         return gson.fromJson(getString("user"), User.class);
     }
 
+    public void setUser(User user) {
+        Gson gson = new Gson();
+        String serialized_user = gson.toJson(user);
+        putString("user", serialized_user);
+    }
 
     public void clear() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
