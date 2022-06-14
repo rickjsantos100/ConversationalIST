@@ -2,22 +2,25 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.fragment.app.DialogFragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatroomAdapter;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityMainBinding;
-import pt.ulisboa.tecnico.cmov.conversationalist.dialogs.CreateChatroomDialogFragment;
 import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
@@ -38,13 +41,35 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
         loadUserDetails();
         setListeners();
         getUserChatrooms();
+
+        getFSMToken();
+    }
+
+    private void getFSMToken() {
+        String TAG = "FIREBASE";
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // Log and toast
+                        Log.w(TAG, "Fetching FCM token" + task.getResult());
+                        Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void setListeners() {
         binding.newRoom.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), ChatroomActivity.class)));
         binding.imgsignOut.setOnClickListener(v -> {
-            DialogFragment newFragment = new CreateChatroomDialogFragment();
-            newFragment.show(getSupportFragmentManager(), "create_chatroom");
+            signOut();
         });
         binding.imgToggleTheme.setOnClickListener(v -> {
             if (preferenceManager.getInt("night") == 1) {
