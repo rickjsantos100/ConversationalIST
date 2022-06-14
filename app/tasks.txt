@@ -55,10 +55,10 @@ TODO: (F) Implement the ability to leave Chat Rooms []
 
 # Lourenço
 TODO: Review logic on the retrieval of the chatrooms []
-TODO: (F) Implement Push Notifications []
+TODO: (F) Implement Push Notifications [x]
 TODO: Quality assurance on home page and search page []
 
 # André
-TODO: (O) Investigate and implement theming []
+TODO: (O) Investigate and implement theming [x]
 TODO: Implement search for chatrooms []
 TODO: Investigate how to send files []
