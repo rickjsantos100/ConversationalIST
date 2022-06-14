@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/ist_gray"
+    android:background="?attr/colorSecondary"
     tools:context=".activities.MainActivity">
 
     <TextView
@@ -41,7 +41,8 @@
             android:id="@+id/progressBar"
             android:layout_width="25sp"
             android:layout_height="25sp"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:color="?attr/colorOnSecondary" />
     </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -55,7 +56,7 @@
         android:src="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/white" />
+        app:tint="?attr/colorOnPrimary" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imgsignOut"
@@ -66,7 +67,7 @@
         android:background="@drawable/background_icon"
         android:padding="6sp"
         android:src="@drawable/ic_power"
-        android:tint="@color/white"
+        android:tint="?attr/colorOnPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -79,7 +80,7 @@
         android:background="@drawable/background_icon"
         android:padding="6sp"
         android:src="@drawable/ic_toggle"
-        android:tint="@color/white"
+        android:tint="?attr/colorOnPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -92,7 +93,7 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:textColor="@color/white"
+        android:textColor="?attr/colorOnPrimary"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/userLetter"

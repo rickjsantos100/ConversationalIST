@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/welcome_back"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSecondary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -45,7 +45,7 @@
             android:inputType="text"
             android:paddingStart="16sp"
             android:paddingEnd="16sp"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSecondary"
             android:textSize="13sp" />
 
         <FrameLayout
@@ -59,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50sp"
                 android:text="@string/login"
-                android:textColor="@color/white"
+                android:textColor="?attr/colorOnPrimary"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 app:cornerRadius="8sp" />
@@ -69,6 +69,7 @@
                 android:layout_width="25sp"
                 android:layout_height="25sp"
                 android:layout_gravity="center"
+                android:color="?attr/colorOnSecondary"
                 android:visibility="invisible" />
 
         </FrameLayout>

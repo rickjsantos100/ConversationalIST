@@ -3,10 +3,10 @@
     <style name="Theme.ConversationalIST" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/ist_blue</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorOnPrimary">#2E2E2E</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/ist_gray</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/ist_blue</item>
         <!-- Customize your theme here. -->

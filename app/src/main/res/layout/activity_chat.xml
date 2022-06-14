@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/ist_gray"
+    android:background="?attr/colorSecondary"
     tools:context=".activities.ChatActivity">
 
     <View
@@ -21,7 +21,7 @@
         android:id="@+id/headerBackground"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/ist_gray"
+        android:background="?attr/colorSecondary"
         app:layout_constraintBottom_toTopOf="@id/viewSupporter"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,7 +35,7 @@
         android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white" />
+        app:tint="?attr/colorOnPrimary" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imageMore"
@@ -47,7 +47,7 @@
         android:src="@drawable/ic_chat_more_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white" />
+        app:tint="?attr/colorOnPrimary" />
 
     <TextView
         android:id="@+id/textName"
@@ -58,7 +58,7 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:textColor="@color/white"
+        android:textColor="?attr/colorOnPrimary"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/imageBack"
@@ -92,6 +92,7 @@
         android:id="@+id/progressBar"
         android:layout_width="25sp"
         android:layout_height="25sp"
+        android:color="?attr/colorOnSecondary"
         app:layout_constraintBottom_toBottomOf="@id/viewBackground"
         app:layout_constraintEnd_toEndOf="@id/viewBackground"
         app:layout_constraintStart_toStartOf="@id/viewBackground"
@@ -113,7 +114,7 @@
             android:layout_marginStart="4sp"
             android:padding="8sp"
             android:src="@drawable/ic_chat_send_button"
-            app:tint="@color/white" />
+            app:tint="?attr/colorOnPrimary" />
 
     </FrameLayout>
 
@@ -131,8 +132,8 @@
         android:inputType="text"
         android:paddingStart="16sp"
         android:paddingEnd="16sp"
-        android:textColor="@color/white"
-        android:textColorHint="@color/hint_text"
+        android:textColor="?attr/colorOnPrimary"
+        android:textColorHint="?attr/colorSecondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/layoutSend"
         app:layout_constraintStart_toStartOf="parent" />

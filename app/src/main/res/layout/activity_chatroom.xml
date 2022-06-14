@@ -16,7 +16,7 @@
         android:layout_marginTop="12sp"
         android:padding="6sp"
         android:src="@drawable/ic_back"
-        android:tint="@color/white"
+        android:tint="?attr/colorOnPrimary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/select_chatroom"
-        android:textColor="@color/white"
+        android:textColor="?attr/colorOnPrimary"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/imageBack"
@@ -55,7 +55,8 @@
             android:id="@+id/progressBar"
             android:layout_width="25sp"
             android:layout_height="25sp"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:color="?attr/colorOnSecondary" />
 
         <TextView
             android:id="@+id/textErrorMessage"
@@ -76,7 +77,7 @@
             android:layout_gravity="bottom|center"
             android:layout_marginBottom="15sp"
             android:text="@string/create_chatroom"
-            android:textColor="@color/white"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="13sp"
             android:textStyle="bold"
             app:cornerRadius="8sp" />
