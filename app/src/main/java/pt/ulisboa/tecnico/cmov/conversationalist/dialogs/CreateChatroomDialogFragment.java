@@ -57,10 +57,11 @@ public class CreateChatroomDialogFragment extends DialogFragment {
 
 //                        TODO:  As of now the chatroom name is the identifier, if we keep that logic we need add that protection.
                             FirebaseFirestore database = FirebaseFirestore.getInstance();
+                            User user = preferenceManager.getUser();
                             Chatroom chatroom = new Chatroom(name,region);
+                            chatroom.setAdminRef(user.getUsername());
                             database.collection("chatrooms").document(chatroom.getName().toString()).set(chatroom).addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
-                                    User user = preferenceManager.getUser();
                                     DocumentReference docRef =  database.collection("users").document(user.getUsername());
 
                                     user.getChatroomsRefs().add(chatroom.getName().toString());

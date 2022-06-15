@@ -17,9 +17,9 @@ public class Chatroom implements Serializable {
     @DocumentId
     public String name;
     public boolean isPrivate;
-    public User admin;
+    public String adminRef;
     public String region;
-    public List<Message> messages;
+    public Integer radius;
 
     public Chatroom(String name, String region){
         this.name = name;
@@ -37,5 +37,13 @@ public class Chatroom implements Serializable {
             return false;
         Chatroom p = (Chatroom) other;
         return p.name.equals(this.name);
+    }
+
+    public String getAdminRef() {
+        return adminRef;
+    }
+
+    public void setAdminRef(String adminRef) {
+        this.adminRef = adminRef;
     }
 }
