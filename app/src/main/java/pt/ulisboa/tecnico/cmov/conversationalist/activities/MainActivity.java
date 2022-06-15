@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -95,35 +96,28 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
     private void getUserChatrooms() {
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
+        List<String> userChatroomsId = preferenceManager.getUser().getChatroomsRefs();
+        List<Chatroom> userChatrooms = new ArrayList<>();
 
-        String username = preferenceManager.getUser().getUsername();
+        for (int i = 0; i < userChatroomsId.size(); i++) {
+            database.collection("chatrooms")
+                    .document(userChatroomsId.get(i))
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        DocumentSnapshot snapshot = task.getResult();
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            Chatroom chatroom = new Chatroom(snapshot.getId(), snapshot.getString("region"));
+                            userChatrooms.add(chatroom);
+                        }
+                    });
+        }
 
-        database.collection("chats").whereEqualTo("sender", username).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                loading(false);
-                List<Message> messages = new ArrayList<>();
-                List<Chatroom> chatrooms = new ArrayList<>();
-
-                for (QueryDocumentSnapshot q : task.getResult()) {
-                    Message message = new Message();
-                    message.chatroom = q.getString("chatroom");
-                    messages.add(message);
-                }
-
-                for (Message m : messages) {
-                    Chatroom chatroom = new Chatroom(m.chatroom);
-                    if (!chatrooms.contains(chatroom)) {
-                        chatrooms.add(chatroom);
-                    }
-                }
-
-                if (chatrooms.size() > 0) {
-                    ChatroomAdapter chatroomAdapter = new ChatroomAdapter(chatrooms, this);
-                    binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
-                    binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
-                }
-            }
-        });
+        if (userChatrooms.size() > 0) {
+            loading(false);
+            ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
+            binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+            binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void loading(Boolean isLoading) {
