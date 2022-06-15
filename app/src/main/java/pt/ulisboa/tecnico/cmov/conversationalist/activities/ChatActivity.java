@@ -1,6 +1,9 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +12,10 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatAdapter;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityChatBinding;
@@ -25,6 +33,7 @@ import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class ChatActivity extends AppCompatActivity {
+    public static final int PICKFILE_RESULT_CODE = 1;
 
     private ActivityChatBinding binding;
     private Chatroom chatroom;
@@ -67,7 +76,7 @@ public class ChatActivity extends AppCompatActivity {
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         preferenceManager = new PreferenceManager(getApplicationContext());
-        messages = new ArrayList<Message>();
+        messages = new ArrayList<>();
 
         chatAdapter = new ChatAdapter(
                 messages,
@@ -102,9 +111,53 @@ public class ChatActivity extends AppCompatActivity {
         binding.inputMessage.setText(null);
     }
 
+    private void chooseFile() {
+        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+        chooseFile.setType("*/*");
+        chooseFile = Intent.createChooser(chooseFile, "Choose a file");
+        // deprecated but better :)
+        startActivityForResult(chooseFile, PICKFILE_RESULT_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("POTATO", "im in " + resultCode + " " + RESULT_OK);
+
+        switch (requestCode) {
+            case PICKFILE_RESULT_CODE:
+                if (resultCode == RESULT_OK) {
+                    Uri uri = data.getData();
+
+                    //storage on firebase
+                    // Create a storage reference from our app
+                    FirebaseStorage storage = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com");
+                    StorageReference storageRef = storage.getReference();
+
+                    // Create file metadata including the content type
+                    StorageMetadata metadata = new StorageMetadata.Builder()
+                            .setContentType("image/jpg")
+                            .build();
+                    UploadTask uploadTask = storageRef.child("images/" + uri.getLastPathSegment()).putFile(uri, metadata);
+
+                    // Register observers to listen for when the download is done or if it fails
+                    uploadTask.addOnFailureListener(t -> {
+                        // handle failure
+                    }).addOnSuccessListener(t -> {
+                        // handle success (add to chat)
+                        t.getMetadata(); // contains file metadata such as size, content type
+                        Log.d("POTATO", "this: " + t);
+                        Log.d("POTATO", "other: " + Objects.requireNonNull(t.getMetadata()));
+                    });
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     private void setListeners() {
         binding.imageBack.setOnClickListener(v -> onBackPressed());
         binding.layoutSend.setOnClickListener(v -> sendMessage());
+        binding.layoutAttachFile.setOnClickListener(v -> chooseFile());
     }
 
     private String parseDate(Date date) {
