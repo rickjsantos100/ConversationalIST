@@ -54,7 +54,7 @@ TODO: (F) Implement the ability to join Chat Rooms []
 TODO: (F) Implement the ability to leave Chat Rooms []
 
 # Lourenço
-TODO: Review logic on the retrieval of the chatrooms []
+TODO: Review logic on the retrieval of the chatrooms [x]
 TODO: (F) Implement Push Notifications [x]
 TODO: Quality assurance on home page and search page []
 
