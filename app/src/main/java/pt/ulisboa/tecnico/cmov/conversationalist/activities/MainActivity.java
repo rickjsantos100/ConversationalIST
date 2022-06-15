@@ -12,9 +12,10 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatroomAdapter;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityMainBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
-import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 
@@ -99,25 +99,28 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
         List<String> userChatroomsId = preferenceManager.getUser().getChatroomsRefs();
         List<Chatroom> userChatrooms = new ArrayList<>();
 
-        for (int i = 0; i < userChatroomsId.size(); i++) {
-            database.collection("chatrooms")
-                    .document(userChatroomsId.get(i))
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        DocumentSnapshot snapshot = task.getResult();
+        //for correctness
+        userChatroomsId.add("notarealid");
+
+        database.collection("chatrooms")
+                .whereIn(FieldPath.documentId(), userChatroomsId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    loading(false);
+                    QuerySnapshot result = task.getResult();
+                    for (QueryDocumentSnapshot snapshot : result) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             Chatroom chatroom = new Chatroom(snapshot.getId(), snapshot.getString("region"));
                             userChatrooms.add(chatroom);
                         }
-                    });
-        }
+                    }
 
-        if (userChatrooms.size() > 0) {
-            loading(false);
-            ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
-            binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
-            binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
-        }
+                    if (userChatrooms.size() > 0) {
+                        ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
+                        binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+                        binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
+                    }
+                });
     }
 
     private void loading(Boolean isLoading) {
