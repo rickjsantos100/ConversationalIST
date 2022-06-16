@@ -49,7 +49,7 @@ TODO: (O) Use bad quality of images on data []
 
 
 # Ricardo
-TODO: Finalize first instance of firebase middleware []
+TODO: Finalize first instance of firebase middleware [x]
 TODO: (F) Implement the ability to join Chat Rooms []
 TODO: (F) Implement the ability to leave Chat Rooms []
 

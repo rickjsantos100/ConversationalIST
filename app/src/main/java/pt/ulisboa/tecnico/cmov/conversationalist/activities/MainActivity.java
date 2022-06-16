@@ -99,28 +99,30 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
         List<String> userChatroomsId = preferenceManager.getUser().getChatroomsRefs();
         List<Chatroom> userChatrooms = new ArrayList<>();
 
-        //for correctness
-        userChatroomsId.add("notarealid");
-
-        database.collection("chatrooms")
-                .whereIn(FieldPath.documentId(), userChatroomsId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    loading(false);
-                    QuerySnapshot result = task.getResult();
-                    for (QueryDocumentSnapshot snapshot : result) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            Chatroom chatroom = new Chatroom(snapshot.getId(), snapshot.getString("region"));
-                            userChatrooms.add(chatroom);
+        if (userChatroomsId.size() > 0) {
+            database.collection("chatrooms")
+                    .whereIn(FieldPath.documentId(), userChatroomsId)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        loading(false);
+                        QuerySnapshot result = task.getResult();
+                        for (QueryDocumentSnapshot snapshot : result) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                Chatroom chatroom = new Chatroom(snapshot.getId(), snapshot.getString("region"));
+                                userChatrooms.add(chatroom);
+                            }
                         }
-                    }
 
-                    if (userChatrooms.size() > 0) {
-                        ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
-                        binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
-                        binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
-                    }
-                });
+                        if (userChatrooms.size() > 0) {
+                            ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
+                            binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+                            binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
+                        }
+                    });
+        } else {
+//            TODO: Add message to the screen saying the user is not in any room
+            loading(false);
+        }
     }
 
     private void loading(Boolean isLoading) {

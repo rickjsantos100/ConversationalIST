@@ -36,12 +36,14 @@ import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatAdapter;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityChatBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class ChatActivity extends AppCompatActivity {
     public static final int PICKFILE_RESULT_CODE = 1;
 
     private ActivityChatBinding binding;
+    private FirebaseManager firebaseManager;
     private Chatroom chatroom;
     private List<Message> messages;
 
@@ -80,10 +82,12 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        preferenceManager = new PreferenceManager(getApplicationContext());
+        firebaseManager = new FirebaseManager(getApplicationContext());
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this));
-        preferenceManager = new PreferenceManager(getApplicationContext());
         messages = new ArrayList<>();
 
         chatAdapter = new ChatAdapter(
@@ -182,11 +186,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void leaveChatroom() {
-        DocumentReference docRef = db.collection("users").document(preferenceManager.getUser().getUsername());
-        docRef.update("chatroomsRefs", FieldValue.arrayRemove(chatroom.getName()));
-        List<String> userChatrooms = preferenceManager.getUser().getChatroomsRefs();
-        userChatrooms.remove(chatroom.getName());
-        preferenceManager.getUser().setChatroomsRefs(userChatrooms);
+        firebaseManager.leaveChatroom(chatroom.getName());
         onBackPressed();
     }
 

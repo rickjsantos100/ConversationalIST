@@ -24,6 +24,7 @@ import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityChatroomBin
 import pt.ulisboa.tecnico.cmov.conversationalist.dialogs.CreateChatroomDialogFragment;
 import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class ChatroomActivity extends AppCompatActivity implements ChatroomListener {
@@ -31,6 +32,7 @@ public class ChatroomActivity extends AppCompatActivity implements ChatroomListe
 
     private ActivityChatroomBinding binding;
     private PreferenceManager preferenceManager;
+    private FirebaseManager firebaseManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,7 @@ public class ChatroomActivity extends AppCompatActivity implements ChatroomListe
         binding = ActivityChatroomBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         preferenceManager = new PreferenceManager(getApplicationContext());
+        firebaseManager = new FirebaseManager(getApplicationContext());
         loading(false);
 
         setListeners();
@@ -95,12 +98,7 @@ public class ChatroomActivity extends AppCompatActivity implements ChatroomListe
 
     @Override
     public void onChatroomClicked(Chatroom chatroom) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference docRef = db.collection("users").document(preferenceManager.getUser().getUsername());
-        docRef.update("chatroomsRefs", FieldValue.arrayUnion(chatroom.getName()));
-        List<String> userChatrooms = preferenceManager.getUser().getChatroomsRefs();
-        userChatrooms.add(chatroom.getName());
-        preferenceManager.getUser().setChatroomsRefs(userChatrooms);
+        firebaseManager.joinChatroom(chatroom.getName());
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra("chatroom", chatroom);
         startActivity(intent);

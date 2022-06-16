@@ -5,10 +5,13 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.activities.MainActivity;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
@@ -38,6 +41,7 @@ public class FirebaseManager {
                 DocumentSnapshot document = task.getResult();
                 if(document.exists()){
                     User firestoreUser = task.getResult().toObject(User.class);
+                    firestoreUser.setUsername(username);
                     preferenceManager.setUser(firestoreUser);
                 }
 //                User firestoreUser = new User(task.getResult().getData()
@@ -57,6 +61,30 @@ public class FirebaseManager {
                 preferenceManager.setUser(newUser);
             }
         });
+    }
+
+    public void leaveChatroom(String chatroomId) {
+        User user = preferenceManager.getUser();
+//      Update the database user
+        DocumentReference docRef = database.collection("users").document(user.getUsername());
+        docRef.update("chatroomsRefs", FieldValue.arrayRemove(chatroomId));
+//      Update the state user
+        List<String> userChatrooms = user.getChatroomsRefs();
+        userChatrooms.remove(chatroomId);
+        user.setChatroomsRefs(userChatrooms);
+        preferenceManager.setUser(user);
+    }
+
+    public void joinChatroom(String chatroomId) {
+        User user = preferenceManager.getUser();
+//       Update the database user
+        DocumentReference docRef = database.collection("users").document(user.getUsername());
+        docRef.update("chatroomsRefs", FieldValue.arrayUnion(chatroomId));
+//        Update the state user
+        List<String> userChatrooms = user.getChatroomsRefs();
+        userChatrooms.add(chatroomId);
+        user.setChatroomsRefs(userChatrooms);
+        preferenceManager.setUser(user);
     }
 
 

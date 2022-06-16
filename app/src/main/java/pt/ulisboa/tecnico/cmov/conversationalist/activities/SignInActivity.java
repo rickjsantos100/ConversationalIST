@@ -11,6 +11,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivitySignInBinding;
+import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
@@ -29,13 +30,16 @@ public class SignInActivity extends AppCompatActivity {
         binding = ActivitySignInBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        if(preferenceManager.getUser() == null) {
+        User user = preferenceManager.getUser();
+        if( user == null) {
             setListeners();
         } else {
 //            TODO: update the stored user with the most recent user information
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+            firebaseManager.getUserById(user.getUsername()).addOnCompleteListener(task -> {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            });
         }
     }
 
