@@ -15,4 +15,6 @@
     <string name="toggle_theme">Toggle Theme</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="sent_image">Sent Image</string>
+    <string name="received_image">Received Image</string>
 </resources>

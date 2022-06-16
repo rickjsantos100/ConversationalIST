@@ -5,12 +5,12 @@ import java.util.Date;
 
 public class Message implements Serializable {
     public String senderId;
-    public MediaType media;
+    public String media;
     public String value;
     public Date timestamp;
     public String chatroom;
 
-    public Message(String senderId, MediaType media, String value, Date timestamp, String chatroom) {
+    public Message(String senderId, String media, String value, Date timestamp, String chatroom) {
         this.senderId = senderId;
         this.media = media;
         this.value = value;

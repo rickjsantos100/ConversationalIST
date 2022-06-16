@@ -12,4 +12,7 @@
     <string name="chatroom_region">Região</string>
     <string name="sign_out">Sair</string>
     <string name="toggle_theme">Mudar Tema</string>
+    <string name="hello_blank_fragment">Olá Fragmento em Branco</string>
+    <string name="sent_image">Imagem enviada</string>
+    <string name="received_image">Imagem Recebida</string>
 </resources>

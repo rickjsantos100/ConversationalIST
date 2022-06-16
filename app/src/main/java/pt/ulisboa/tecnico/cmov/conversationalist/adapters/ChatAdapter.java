@@ -1,21 +1,28 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.adapters;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ItemContainerReceivedMessageBinding;
+import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ItemContainerReceivedMessageImageBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ItemContainerSentMessageBinding;
+import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ItemContainerSentMessageImageBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVED = 2;
+    public static final int VIEW_TYPE_SENT_IMAGE = 3;
+    public static final int VIEW_TYPE_RECEIVED_IMAGE = 4;
 
     private final List<Message> messages;
     private final String senderId;
@@ -36,9 +43,21 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             false
                     )
             );
-        } else {
+        } else if (viewType == VIEW_TYPE_RECEIVED) {
             return new ReceivedMessageViewHolder(
                     ItemContainerReceivedMessageBinding.inflate(
+                            LayoutInflater.from(parent.getContext()),
+                            parent,
+                            false
+                    )
+            );
+        } else if (viewType == VIEW_TYPE_SENT_IMAGE) {
+            return new SentMessageImageViewHolder(ItemContainerSentMessageImageBinding.inflate(
+                    LayoutInflater.from(parent.getContext()), parent, false)
+            );
+        } else {
+            return new ReceivedMessageImageViewHolder(
+                    ItemContainerReceivedMessageImageBinding.inflate(
                             LayoutInflater.from(parent.getContext()),
                             parent,
                             false
@@ -51,8 +70,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (getItemViewType(position) == VIEW_TYPE_SENT) {
             ((SentMessageViewHolder) holder).setData(messages.get(position));
-        } else {
+        } else if (getItemViewType(position) == VIEW_TYPE_RECEIVED) {
             ((ReceivedMessageViewHolder) holder).setData(messages.get(position));
+        } else if (getItemViewType(position) == VIEW_TYPE_SENT_IMAGE) {
+            ((SentMessageImageViewHolder) holder).setData(messages.get(position));
+        } else {
+            ((ReceivedMessageImageViewHolder) holder).setData(messages.get(position));
         }
     }
 
@@ -63,13 +86,22 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        if (messages.get(position).senderId == null) {
+        String type = messages.get(position).media;
+        if (messages.get(position).senderId == null || type == null) {
             return VIEW_TYPE_SENT;
         }
-        if (messages.get(position).senderId.equals(senderId)) { // Refactor to check if this corresponds to the user that's currently logged in
-            return VIEW_TYPE_SENT;
+        if (messages.get(position).senderId.equals(senderId)) {
+            if (type.equals("text")) {
+                return VIEW_TYPE_SENT;
+            } else {
+                return VIEW_TYPE_SENT_IMAGE;
+            }
         } else {
-            return VIEW_TYPE_RECEIVED;
+            if (type.equals("text")) {
+                return VIEW_TYPE_RECEIVED;
+            } else {
+                return VIEW_TYPE_RECEIVED_IMAGE;
+            }
         }
     }
 
@@ -84,6 +116,40 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void setData(Message message) {
             binding.textMessage.setText(message.value);
 //            TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
+            binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
+        }
+    }
+
+    static class SentMessageImageViewHolder extends RecyclerView.ViewHolder {
+        private final ItemContainerSentMessageImageBinding binding;
+
+        SentMessageImageViewHolder(ItemContainerSentMessageImageBinding itemContainerSentMessageImageBinding) {
+            super(itemContainerSentMessageImageBinding.getRoot());
+            binding = itemContainerSentMessageImageBinding;
+        }
+
+        void setData(Message message) {
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            // Load image, decode it to Bitmap and display Bitmap in ImageView (or any other view
+//	which implements ImageAware interface)
+            imageLoader.displayImage(message.value, binding.imgMessage);
+
+//          TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
+            binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
+        }
+    }
+
+    static class ReceivedMessageImageViewHolder extends RecyclerView.ViewHolder {
+        private final ItemContainerReceivedMessageImageBinding binding;
+
+        ReceivedMessageImageViewHolder(ItemContainerReceivedMessageImageBinding itemContainerReceivedMessageImageBinding) {
+            super(itemContainerReceivedMessageImageBinding.getRoot());
+            binding = itemContainerReceivedMessageImageBinding;
+        }
+
+        void setData(Message message) {
+            binding.imgMessage.setImageURI(Uri.parse(message.value));
+//          TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
             binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
         }
     }

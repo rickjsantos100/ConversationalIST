@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -22,6 +20,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatAdapter;
@@ -58,6 +57,7 @@ public class ChatActivity extends AppCompatActivity {
                     Message message = new Message();
                     message.senderId = documentChange.getDocument().getString("sender");
                     message.chatroom = documentChange.getDocument().getString("chatroom");
+                    message.media = documentChange.getDocument().getString("media");
                     message.value = documentChange.getDocument().getString("value");
                     message.timestamp = documentChange.getDocument().getDate("timestamp");
                     messages.add(message);
@@ -82,6 +82,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(this));
         preferenceManager = new PreferenceManager(getApplicationContext());
         messages = new ArrayList<>();
 
@@ -105,12 +106,13 @@ public class ChatActivity extends AppCompatActivity {
         db.collection("chats").whereEqualTo("chatroom", chatroom.name).addSnapshotListener(eventListener);
     }
 
-    private void sendMessage() {
-        if (!binding.inputMessage.getText().toString().matches("") && !binding.inputMessage.getText().toString().trim().isEmpty()) {
+    private void sendMessage(String type, String content) {
+        if (!content.matches("") && !content.trim().isEmpty()) {
             HashMap<String, Object> message = new HashMap<>();
             message.put("sender", preferenceManager.getUser().getUsername());
             message.put("chatroom", chatroom.name);
-            message.put("value", binding.inputMessage.getText().toString());
+            message.put("media", type);
+            message.put("value", content);
             message.put("timestamp", new Date());
 
             db.collection("chats").add(message);
@@ -119,7 +121,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void chooseFile() {
-        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent chooseFile = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         chooseFile.setType("*/*");
         chooseFile = Intent.createChooser(chooseFile, "Choose a file");
         // deprecated but better :)
@@ -128,12 +130,11 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("POTATO", "im in " + resultCode + " " + RESULT_OK);
-
         switch (requestCode) {
             case PICKFILE_RESULT_CODE:
                 if (resultCode == RESULT_OK) {
                     Uri uri = data.getData();
+                    String path = uri.getPath();
 
                     //storage on firebase
                     // Create a storage reference from our app
@@ -151,9 +152,9 @@ public class ChatActivity extends AppCompatActivity {
                         // handle failure
                     }).addOnSuccessListener(t -> {
                         // handle success (add to chat)
-                        t.getMetadata(); // contains file metadata such as size, content type
-                        Log.d("POTATO", "this: " + t);
-                        Log.d("POTATO", "other: " + Objects.requireNonNull(t.getMetadata()));
+                        //t.getMetadata(); // contains file metadata such as size, content type
+                        // send as a message when it has been posted on the server
+                        sendMessage("image", uri.toString());
                     });
                 }
                 break;
@@ -191,7 +192,10 @@ public class ChatActivity extends AppCompatActivity {
 
     private void setListeners() {
         binding.imageBack.setOnClickListener(v -> onBackPressed());
-        binding.layoutSend.setOnClickListener(v -> sendMessage());
+        binding.layoutSend.setOnClickListener(v -> {
+            String content = binding.inputMessage.getText().toString().trim();
+            sendMessage("text", content);
+        });
         binding.layoutAttachFile.setOnClickListener(v -> chooseFile());
     }
 
