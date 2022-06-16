@@ -4,12 +4,18 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -26,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatAdapter;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityChatBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
@@ -152,6 +159,34 @@ public class ChatActivity extends AppCompatActivity {
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void showMoreOptionsMenu(View view) {
+        PopupMenu moreOptionsMenu = new PopupMenu(getApplicationContext(), view);
+        MenuInflater inflater = moreOptionsMenu.getMenuInflater();
+        inflater.inflate(R.menu.chat_more_options_menu, moreOptionsMenu.getMenu());
+        moreOptionsMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.leaveChatroom:
+                        leaveChatroom();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        moreOptionsMenu.show();
+    }
+
+    private void leaveChatroom() {
+        DocumentReference docRef = db.collection("users").document(preferenceManager.getUser().getUsername());
+        docRef.update("chatroomsRefs", FieldValue.arrayRemove(chatroom.getName()));
+        List<String> userChatrooms = preferenceManager.getUser().getChatroomsRefs();
+        userChatrooms.remove(chatroom.getName());
+        preferenceManager.getUser().setChatroomsRefs(userChatrooms);
+        onBackPressed();
     }
 
     private void setListeners() {

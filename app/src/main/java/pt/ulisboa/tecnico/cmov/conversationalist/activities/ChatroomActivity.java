@@ -10,6 +10,8 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -93,6 +95,12 @@ public class ChatroomActivity extends AppCompatActivity implements ChatroomListe
 
     @Override
     public void onChatroomClicked(Chatroom chatroom) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("users").document(preferenceManager.getUser().getUsername());
+        docRef.update("chatroomsRefs", FieldValue.arrayUnion(chatroom.getName()));
+        List<String> userChatrooms = preferenceManager.getUser().getChatroomsRefs();
+        userChatrooms.add(chatroom.getName());
+        preferenceManager.getUser().setChatroomsRefs(userChatrooms);
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra("chatroom", chatroom);
         startActivity(intent);

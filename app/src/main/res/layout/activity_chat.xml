@@ -45,6 +45,7 @@
         android:layout_marginEnd="16sp"
         android:padding="4sp"
         android:src="@drawable/ic_chat_more_btn"
+        android:onClick="showMoreOptionsMenu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="?attr/colorOnPrimary" />
