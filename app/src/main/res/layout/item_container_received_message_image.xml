@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/imgMessage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="240sp"
+        android:layout_height="180sp"
         android:background="@drawable/chat_received_message_background"
         android:contentDescription="@string/received_image"
         android:paddingStart="12sp"

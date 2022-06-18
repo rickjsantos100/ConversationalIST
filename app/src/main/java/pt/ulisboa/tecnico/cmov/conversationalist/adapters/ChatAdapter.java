@@ -1,13 +1,16 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.adapters;
 
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.bumptech.glide.Glide;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
@@ -129,10 +132,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
-            ImageLoader imageLoader = ImageLoader.getInstance();
-            // Load image, decode it to Bitmap and display Bitmap in ImageView (or any other view
-//	which implements ImageAware interface)
-            imageLoader.displayImage(message.value, binding.imgMessage);
+
+            // get firebase image file reference
+            Uri uri = Uri.parse(message.value);
+            Log.d("POTATO", "images/" + uri.getLastPathSegment());
+            StorageReference storageReference = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com").getReference().child("images/" + uri.getLastPathSegment());
+            Glide.with(binding.getRoot())
+                    .load(storageReference)
+                    .into(binding.imgMessage);
 
 //          TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
             binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
@@ -148,7 +155,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
-            binding.imgMessage.setImageURI(Uri.parse(message.value));
+
+            // get firebase image file reference
+            Uri uri = Uri.parse(message.value);
+            StorageReference storageReference = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com").getReference("images/" + uri.getLastPathSegment());
+
+            Glide.with(binding.getRoot())
+                    .load(storageReference)
+                    .into(binding.imgMessage);
 //          TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
             binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
         }
