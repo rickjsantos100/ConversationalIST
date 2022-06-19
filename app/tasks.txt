@@ -9,9 +9,9 @@ TODO: (O) Investigate and implement l10n [x]
 
 # create the pages with the theming and translations
 TODO: (F) Create Login Page [x]
-TODO: (F) Create Main Page with ACTIVE Chat Room List []
-TODO: (F) Create Page to choose a Chat Room to join (list) []
-TODO: (F) Create Page of Chat Room (not functional) []
+TODO: (F) Create Main Page with ACTIVE Chat Room List [x]
+TODO: (F) Create Page to choose a Chat Room to join (list) [x]
+TODO: (F) Create Page of Chat Room (not functional) [x]
 TODO: (F) Create separator with dates on the chat (opc.) []
 Have all the pages communicate with firebase
 
@@ -32,7 +32,7 @@ TODO: (O) Implement Caching of messages (local storage) - if chatroom has notifi
 
 # Search and New media
 TODO: (F) Implement Search feature on Chat Room Page []
-TODO: (F) Implement Photos in chat []
+TODO: (F) Implement Photos in chat [x]
 TODO: (O) Implement Caching of images with LRU
 TODO: (F) Implement Embedded map that allows you to select a location, search an address or uses phone current location and send the result on the chat with a different media type []
 TODO: (F) Implement Open Map on Google Maps of the location in the message []
@@ -51,7 +51,7 @@ TODO: (O) Use bad quality of images on data []
 # Ricardo
 TODO: Finalize first instance of firebase middleware [x]
 TODO: (F) Implement the ability to join Chat Rooms []
-TODO: (F) Implement the ability to leave Chat Rooms []
+TODO: (F) Implement the ability to leave Chat Rooms [x]
 
 # Lourenço
 TODO: Review logic on the retrieval of the chatrooms [x]
@@ -61,4 +61,4 @@ TODO: Quality assurance on home page and search page []
 # André
 TODO: (O) Investigate and implement theming [x]
 TODO: Implement search for chatrooms []
-TODO: Investigate how to send files []
+TODO: Investigate how to send files [x]
