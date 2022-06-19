@@ -80,6 +80,9 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
             }
             preferenceManager.putInt("night", AppCompatDelegate.getDefaultNightMode());
         });
+        binding.imgOpenMaps.setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+        });
     }
 
     private void loadUserDetails() {

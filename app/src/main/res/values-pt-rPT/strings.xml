@@ -15,4 +15,5 @@
     <string name="hello_blank_fragment">Olá Fragmento em Branco</string>
     <string name="sent_image">Imagem enviada</string>
     <string name="received_image">Imagem Recebida</string>
+    <string name="title_activity_maps">Atividade do Mapa</string>
 </resources>
