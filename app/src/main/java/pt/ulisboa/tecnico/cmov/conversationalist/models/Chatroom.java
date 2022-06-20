@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmov.conversationalist.models;
 import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class Chatroom implements Serializable {
 
@@ -13,23 +12,22 @@ public class Chatroom implements Serializable {
     public boolean isPrivate;
     public String adminRef;
     public String region;
-    public Integer radius;
+    public Long radius;
 
     public Chatroom() {
     }
 
-    public Chatroom(String name, String region){
+    public Chatroom(String name, String region) {
         this.name = name;
         this.region = region;
     }
 
-    public Chatroom(String name){
+    public Chatroom(String name) {
         this.name = name;
     }
 
     @Override
-    public boolean equals(Object other)
-    {
+    public boolean equals(Object other) {
         if (!(other instanceof Chatroom))
             return false;
         Chatroom p = (Chatroom) other;
@@ -40,16 +38,16 @@ public class Chatroom implements Serializable {
         return adminRef;
     }
 
+    public void setAdminRef(String adminRef) {
+        this.adminRef = adminRef;
+    }
+
     public boolean isPrivate() {
         return isPrivate;
     }
 
     public void setPrivate(boolean aPrivate) {
         isPrivate = aPrivate;
-    }
-
-    public void setAdminRef(String adminRef) {
-        this.adminRef = adminRef;
     }
 
     public String getName() {

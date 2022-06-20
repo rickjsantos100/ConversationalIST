@@ -19,4 +19,6 @@
     <string name="received_image">Received Image</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="is_private">Private</string>
+    <string name="search">Search</string>
+    <string name="search_rooms">Search Rooms...</string>
 </resources>

@@ -1,22 +1,21 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.DialogFragment;
 
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatroomAdapter;
@@ -25,23 +24,23 @@ import pt.ulisboa.tecnico.cmov.conversationalist.dialogs.CreateChatroomDialogFra
 import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
-import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class ChatroomActivity extends AppCompatActivity implements ChatroomListener {
 
 
     private ActivityChatroomBinding binding;
-    private PreferenceManager preferenceManager;
     private FirebaseManager firebaseManager;
+    private List<Chatroom> chatrooms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChatroomBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        preferenceManager = new PreferenceManager(getApplicationContext());
         firebaseManager = new FirebaseManager(getApplicationContext());
         loading(false);
+
+        this.chatrooms = new ArrayList<>();
 
         setListeners();
         getChatrooms();
@@ -62,11 +61,14 @@ public class ChatroomActivity extends AppCompatActivity implements ChatroomListe
         database.collection("chatrooms").get().addOnCompleteListener(task -> {
             loading(false);
             if (task.isSuccessful() && task.getResult() != null) {
-                List<Chatroom> chatrooms = new ArrayList<>();
-                //TODO: iterate over the rooms that the user already belongs and remove those from here
-                //TODO: Find a way to use the @documentId notation to directly cast to list
+                chatrooms = new ArrayList<>();
                 for (QueryDocumentSnapshot q : task.getResult()) {
-                    Chatroom chatroom = new Chatroom(q.getString("name"),q.getString("region") );
+                    Chatroom chatroom = new Chatroom();
+                    chatroom.name = q.getId();
+                    chatroom.region = q.getString("region");
+                    chatroom.radius = q.getLong("radius");
+                    chatroom.isPrivate = Boolean.TRUE.equals(q.getBoolean("isPrivate")) || Boolean.TRUE.equals(q.getBoolean("private"));
+                    chatroom.adminRef = q.getString("admingRef");
                     chatrooms.add(chatroom);
                 }
                 if (chatrooms.size() > 0) {
@@ -103,6 +105,42 @@ public class ChatroomActivity extends AppCompatActivity implements ChatroomListe
         intent.putExtra("chatroom", chatroom);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.searchable_menu_chatrooms, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+
+        ChatroomActivity self = this;
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                List<Chatroom> filteredChatrooms;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    filteredChatrooms = chatrooms.stream().filter(o -> o.name.startsWith(s)).collect(Collectors.toList());
+                } else {
+                    filteredChatrooms = new ArrayList<>();
+                    for (Chatroom c : chatrooms) {
+                        if (c.name.startsWith(s)) {
+                            filteredChatrooms.add(c);
+                        }
+                    }
+                }
+                ChatroomAdapter chatroomAdapter = new ChatroomAdapter(filteredChatrooms, self);
+                binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 }
 
