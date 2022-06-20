@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -30,7 +31,7 @@ import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 
-public class MainActivity extends AppCompatActivity implements ChatroomListener {
+public class MainActivity extends BaseActivity implements ChatroomListener {
 
     private ActivityMainBinding binding;
     private PreferenceManager preferenceManager;

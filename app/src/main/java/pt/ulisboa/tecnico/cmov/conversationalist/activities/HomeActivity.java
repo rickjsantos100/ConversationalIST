@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends BaseActivity {
 
     private static final String TAG = "Home Activity";
     private static final String USER_OBJECT = "user_object";

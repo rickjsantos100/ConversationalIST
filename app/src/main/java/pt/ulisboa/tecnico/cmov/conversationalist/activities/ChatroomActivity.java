@@ -25,7 +25,7 @@ import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 
-public class ChatroomActivity extends AppCompatActivity implements ChatroomListener {
+public class ChatroomActivity extends BaseActivity implements ChatroomListener {
 
 
     private ActivityChatroomBinding binding;

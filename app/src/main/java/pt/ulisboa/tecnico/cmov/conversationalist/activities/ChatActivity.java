@@ -3,21 +3,32 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,23 +37,31 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatAdapter;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityChatBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
+import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
+import pt.ulisboa.tecnico.cmov.conversationalist.network.APIClient;
+import pt.ulisboa.tecnico.cmov.conversationalist.network.APIService;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.NotificationHelper;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends BaseActivity {
     public static final int PICKFILE_RESULT_CODE = 1;
 
     private ActivityChatBinding binding;
     private FirebaseManager firebaseManager;
     private Chatroom chatroom;
     private List<Message> messages;
-
+    private NotificationHelper notificationHelper;
     private ChatAdapter chatAdapter;
     private final EventListener<QuerySnapshot> eventListener = (value, err) -> {
         if (err != null) {
@@ -118,9 +137,34 @@ public class ChatActivity extends AppCompatActivity {
 
             db.collection("chats").add(message);
         }
+
+        List<String> offlineUsersUsernames = getOfflineUsers();
+
         binding.inputMessage.setText(null);
     }
 
+    private List<String> getOfflineUsers() {
+        List<String> offlineUsersUsernames = new ArrayList<>();
+
+        db.collection("users")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Map<String, Object> currentUserData = document.getData();
+                                int isOnline = (int) currentUserData.get("online");
+                                if (isOnline == 0) {
+                                    offlineUsersUsernames.add(document.getId());
+                                }
+                            }
+                        }
+                    }
+                });
+
+        return offlineUsersUsernames;
+    }
     private void chooseFile() {
         Intent chooseFile = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         chooseFile.setType("*/*");
