@@ -16,4 +16,5 @@
     <string name="sent_image">Imagem enviada</string>
     <string name="received_image">Imagem Recebida</string>
     <string name="title_activity_maps">Atividade do Mapa</string>
+    <string name="is_private">Privado</string>
 </resources>

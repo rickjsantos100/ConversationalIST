@@ -20,7 +20,7 @@
         <EditText
             android:id="@+id/name"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:layout_marginLeft="4dp"
             android:layout_marginTop="16dp"
             android:layout_marginRight="4dp"
@@ -32,7 +32,7 @@
         <EditText
             android:id="@+id/region"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="62dp"
             android:layout_marginLeft="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginRight="4dp"
@@ -41,6 +41,13 @@
             android:fontFamily="sans-serif"
             android:hint="@string/chatroom_region"
             android:inputType="text" />
+
+        <RadioButton
+            android:id="@+id/privateRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/is_private" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

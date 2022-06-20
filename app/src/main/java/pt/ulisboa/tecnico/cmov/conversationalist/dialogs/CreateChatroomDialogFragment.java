@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.fragment.app.DialogFragment;
@@ -18,6 +19,7 @@ import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.CreateChatroomDialogBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 
@@ -25,12 +27,14 @@ public class CreateChatroomDialogFragment extends DialogFragment {
 
     private CreateChatroomDialogBinding binding;
     private PreferenceManager preferenceManager;
+    private FirebaseManager firebaseManager;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         binding = CreateChatroomDialogBinding.inflate(getLayoutInflater());
 
         preferenceManager = new PreferenceManager(getActivity());
+        firebaseManager = new FirebaseManager(getActivity());
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
@@ -49,6 +53,7 @@ public class CreateChatroomDialogFragment extends DialogFragment {
 //                        TODO: Fix, the binding isn't working properly, name is always coming empty
                         String name = ((EditText)view.findViewById(R.id.name)).getText().toString();
                         String region = ((EditText)view.findViewById(R.id.region)).getText().toString();
+                        Boolean isPrivate = ((RadioButton)view.findViewById(R.id.privateRadioButton)).isChecked();
 
                         if(name.isEmpty()) {
 //                            TODO: Stop this situation from closing the dialog
@@ -59,19 +64,11 @@ public class CreateChatroomDialogFragment extends DialogFragment {
                             FirebaseFirestore database = FirebaseFirestore.getInstance();
                             User user = preferenceManager.getUser();
                             Chatroom chatroom = new Chatroom(name,region);
+                            chatroom.setPrivate(isPrivate);
                             chatroom.setAdminRef(user.getUsername());
-                            database.collection("chatrooms").document(chatroom.getName().toString()).set(chatroom).addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    DocumentReference docRef =  database.collection("users").document(user.getUsername());
 
-                                    user.getChatroomsRefs().add(chatroom.getName().toString());
-//                                    TODO: Create service to run regular firestore calls that also keep shared preferences updated
-                                    docRef.update("chatroomsRefs" , user.getChatroomsRefs());
-                                    preferenceManager.setUser(user);
-
-                                } else {
-                                    Toast.makeText(getActivity(), "Error creating chatroom", Toast.LENGTH_SHORT).show();
-                                }
+                            firebaseManager.createChatroom(chatroom).addOnFailureListener( task -> {
+                                Toast.makeText(getActivity(), "Error creating chatroom", Toast.LENGTH_SHORT).show();
                             });
                         }
                     }

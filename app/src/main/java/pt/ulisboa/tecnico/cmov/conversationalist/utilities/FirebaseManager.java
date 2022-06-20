@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.activities.MainActivity;
+import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 
 public class FirebaseManager {
@@ -40,7 +41,7 @@ public class FirebaseManager {
             if(task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if(document.exists()){
-                    User firestoreUser = task.getResult().toObject(User.class);
+                    User firestoreUser = document.toObject(User.class);
                     firestoreUser.setUsername(username);
                     preferenceManager.setUser(firestoreUser);
                 }
@@ -85,6 +86,29 @@ public class FirebaseManager {
         userChatrooms.add(chatroomId);
         user.setChatroomsRefs(userChatrooms);
         preferenceManager.setUser(user);
+    }
+
+
+    public Task<Void> createChatroom(Chatroom chatroom) {
+        return database.collection("chatrooms").document(chatroom.getName()).set(chatroom).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                User user = preferenceManager.getUser();
+                DocumentReference docRef =  database.collection("users").document(user.getUsername());
+
+                user.getChatroomsRefs().add(chatroom.getName().toString());
+                docRef.update("chatroomsRefs" , user.getChatroomsRefs());
+                preferenceManager.setUser(user);
+
+            }
+        });
+    }
+
+    public Task<DocumentSnapshot> getChatroom(String id) {
+//        TODO: manipulate result to return a Task<Chatroom>
+        return database.collection("chatrooms").document(id).get();
+//                .addOnSuccessListener(documentSnapshot -> {
+//                    return documentSnapshot.toObject(Chatroom.class);
+//                });
     }
 
 

@@ -31,7 +31,7 @@
         <activity
             android:name=".activities.MapsActivity"
             android:exported="false"
-            android:label="@string/title_activity_maps" />
+            android:label="@string/title_activity_maps"></activity>
         <activity
             android:name=".activities.SignInActivity"
             android:exported="true"
@@ -44,14 +44,26 @@
         </activity>
         <activity
             android:name=".activities.MainActivity"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="www.conversationalist.pt"
+                    android:pathPrefix="/chat" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.ChatroomActivity"
             android:exported="false" />
         <activity
             android:name=".activities.ChatActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity
             android:name=".activities.HomeActivity"
             android:exported="false" />

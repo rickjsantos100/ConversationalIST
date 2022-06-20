@@ -94,6 +94,8 @@ public class ChatActivity extends AppCompatActivity {
         setListeners();
         loadRoomInfo();
         listenMessages();
+
+
     }
 
     private void loadRoomInfo() {
@@ -172,6 +174,10 @@ public class ChatActivity extends AppCompatActivity {
                     case R.id.leaveChatroom:
                         leaveChatroom();
                         return true;
+
+                    case R.id.shareChatroom:
+                        shareChatroom();
+                        return true;
                     default:
                         return false;
                 }
@@ -183,6 +189,23 @@ public class ChatActivity extends AppCompatActivity {
     private void leaveChatroom() {
         firebaseManager.leaveChatroom(chatroom.getName());
         onBackPressed();
+    }
+
+    private void shareChatroom() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "ConversationalIST");
+//        TODO: translate below
+        String shareMessage= "\nJoin me in " + chatroom.getName() +"\n\n";
+
+        String shareUrl = Uri.parse("http://www.conversationalist.pt")
+                .buildUpon().appendPath("chat")
+                .appendQueryParameter("id", chatroom.getName())
+                .build().toString();
+
+        shareMessage = shareMessage + shareUrl +"\n\n";
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+        startActivity(Intent.createChooser(shareIntent, "choose one"));
     }
 
     private void setListeners() {

@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatroomAdapter;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityMainBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
 
     private ActivityMainBinding binding;
     private PreferenceManager preferenceManager;
+    private FirebaseManager firebaseManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +42,33 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         preferenceManager = new PreferenceManager(getApplicationContext());
+        firebaseManager = new FirebaseManager(getApplicationContext());
         loadUserDetails();
         setListeners();
         getUserChatrooms();
 
         getFSMToken();
+
+
+        handleIntent(getIntent());
+    }
+
+    private void handleIntent(Intent intent) {
+        String appLinkAction = intent.getAction();
+        Uri appLinkData = intent.getData();
+        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
+            if (preferenceManager.getUser().getUsername() != null) {
+                String chatroomId = appLinkData.getQueryParameter("id");
+                firebaseManager.getChatroom(chatroomId).addOnSuccessListener(documentSnapshot -> {
+                    Chatroom chatroom = documentSnapshot.toObject(Chatroom.class);
+                    navigateToChatroom(chatroom);
+                });
+            } else {
+                Intent signInIntent = new Intent(getApplicationContext(), SignInActivity.class);
+                signInIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(signInIntent);
+            }
+        }
     }
 
     private void getFSMToken() {
@@ -139,10 +164,15 @@ public class MainActivity extends AppCompatActivity implements ChatroomListener 
 
     @Override
     public void onChatroomClicked(Chatroom chatroom) {
+        navigateToChatroom(chatroom);
+    }
+
+    private void navigateToChatroom(Chatroom chatroom) {
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra("chatroom", chatroom);
         startActivity(intent);
     }
+
 
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {

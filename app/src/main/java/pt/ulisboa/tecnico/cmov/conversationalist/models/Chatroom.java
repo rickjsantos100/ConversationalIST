@@ -6,13 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Chatroom implements Serializable {
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     @DocumentId
     public String name;
@@ -20,6 +14,9 @@ public class Chatroom implements Serializable {
     public String adminRef;
     public String region;
     public Integer radius;
+
+    public Chatroom() {
+    }
 
     public Chatroom(String name, String region){
         this.name = name;
@@ -43,7 +40,23 @@ public class Chatroom implements Serializable {
         return adminRef;
     }
 
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
+
     public void setAdminRef(String adminRef) {
         this.adminRef = adminRef;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
