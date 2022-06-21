@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +41,7 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
         loadUserDetails();
         setListeners();
         getUserChatrooms();
-
-
+        getToken();
         handleIntent(getIntent());
     }
 
@@ -86,8 +86,17 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
         binding.textName.setText(preferenceManager.getUser().getUsername());
     }
 
+    private void updateToken(String token) {
+        firebaseManager.updateToken(token);
+    }
+
+    private void getToken() {
+        FirebaseMessaging.getInstance().getToken().addOnSuccessListener(this::updateToken);
+    }
+
     private void signOut() {
         Toast.makeText(getApplicationContext(), "Signing out...", Toast.LENGTH_SHORT).show();
+        firebaseManager.clearToken();
         preferenceManager.clear();
         startActivity(new Intent(getApplicationContext(), SignInActivity.class));
         finish();

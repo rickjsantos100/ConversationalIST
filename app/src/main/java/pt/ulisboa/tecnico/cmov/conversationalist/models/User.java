@@ -14,12 +14,14 @@ public class User implements Serializable {
     private Long lastAccess;
     private List<String> chatroomsRefs;
     private String password;
+    private String fcm;
 
     public User() {
         this.username = "";
         this.lastAccess = 0L;
         this.chatroomsRefs = new ArrayList<>();
-        password = "";
+        this.password = "";
+        this.fcm = "";
     }
 
     public User(Long lastAccess) {
@@ -32,6 +34,14 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFCM() {
+        return this.fcm;
+    }
+
+    public void setFCM(String fcm) {
+        this.fcm = fcm;
     }
 
     public Long getLastAccess() {

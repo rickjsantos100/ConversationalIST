@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.utilities;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -11,12 +12,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 
 public class FirebaseManager {
+    private static final String TAG = "FirebaseManager";
+
     private final PreferenceManager preferenceManager;
     private final FirebaseFirestore database;
 
@@ -125,6 +129,21 @@ public class FirebaseManager {
 //                .addOnSuccessListener(documentSnapshot -> {
 //                    return documentSnapshot.toObject(Chatroom.class);
 //                });
+    }
+
+    public void updateToken(String token) {
+        DocumentReference reference = database.collection("users").document(preferenceManager.getUser().getUsername());
+        reference.update("fcm", token).addOnSuccessListener(v -> {
+            preferenceManager.getUser().setFCM(token);
+            Log.d(TAG, "Updated FCM");
+        });
+    }
+
+    public void clearToken() {
+        DocumentReference reference = database.collection("users").document(preferenceManager.getUser().getUsername());
+        HashMap<String, Object> updates = new HashMap<>();
+        updates.put("fcm", FieldValue.delete());
+        reference.update(updates);
     }
 
 
