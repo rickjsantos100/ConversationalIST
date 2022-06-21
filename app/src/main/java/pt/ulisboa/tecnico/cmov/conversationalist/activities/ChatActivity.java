@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -236,6 +237,9 @@ public class ChatActivity extends BaseActivity {
                     Uri uri = data.getData();
                     String path = uri.getPath();
 
+                    ContentResolver cR = getContentResolver();
+                    String type = cR.getType(uri);
+
                     //storage on firebase
                     // Create a storage reference from our app
                     FirebaseStorage storage = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com");
@@ -243,7 +247,7 @@ public class ChatActivity extends BaseActivity {
 
                     // Create file metadata including the content type
                     StorageMetadata metadata = new StorageMetadata.Builder()
-                            .setContentType("image/jpg")
+                            .setContentType(type)
                             .build();
                     UploadTask uploadTask = storageRef.child("images/" + uri.getLastPathSegment()).putFile(uri, metadata);
 

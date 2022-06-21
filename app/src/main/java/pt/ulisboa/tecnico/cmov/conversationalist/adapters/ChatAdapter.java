@@ -1,8 +1,10 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.adapters;
 
+import android.content.ContentResolver;
+import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -135,13 +137,29 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             // get firebase image file reference
             Uri uri = Uri.parse(message.value);
-            Log.d("POTATO", "images/" + uri.getLastPathSegment());
-            StorageReference storageReference = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com").getReference().child("images/" + uri.getLastPathSegment());
-            Glide.with(binding.getRoot())
-                    .load(storageReference)
-                    .into(binding.imgMessage);
+
+            ContentResolver cR = binding.getRoot().getContext().getContentResolver();
+            String type = cR.getType(uri);
+
+            StorageReference storageReference = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com").getReference("images/" + uri.getLastPathSegment());
+
+            if (type.equals("application/pdf")) {
+                binding.imagePDF.setVisibility(View.VISIBLE);
+                binding.imagePDF.setOnClickListener(v -> {
+                    storageReference.getDownloadUrl().addOnSuccessListener(t -> {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(t, "application/pdf");
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                        binding.getRoot().getContext().startActivity(intent);
+                    });
+                });
+            } else {
+                Glide.with(binding.getRoot())
+                        .load(storageReference)
+                        .into(binding.imgMessage);
 
 //          TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
+            }
             binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
         }
     }
@@ -155,14 +173,29 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
-
             // get firebase image file reference
             Uri uri = Uri.parse(message.value);
+
+            ContentResolver cR = binding.getRoot().getContext().getContentResolver();
+            String type = cR.getType(uri);
+
             StorageReference storageReference = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com").getReference("images/" + uri.getLastPathSegment());
 
-            Glide.with(binding.getRoot())
-                    .load(storageReference)
-                    .into(binding.imgMessage);
+            if (type.equals("application/pdf")) {
+                binding.imagePDF.setVisibility(View.VISIBLE);
+                binding.imagePDF.setOnClickListener(v -> {
+                    storageReference.getDownloadUrl().addOnSuccessListener(t -> {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(t, "application/pdf");
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                        binding.getRoot().getContext().startActivity(intent);
+                    });
+                });
+            } else {
+                Glide.with(binding.getRoot())
+                        .load(storageReference)
+                        .into(binding.imgMessage);
+            }
 //          TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
             binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
         }

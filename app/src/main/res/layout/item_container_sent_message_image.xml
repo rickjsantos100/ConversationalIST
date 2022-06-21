@@ -24,6 +24,19 @@
         app:layout_constraintWidth_max="wrap"
         app:layout_constraintWidth_percent="0.8" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imagePDF"
+        android:layout_width="200sp"
+        android:layout_height="150sp"
+        android:layout_marginStart="16sp"
+        android:layout_marginTop="12sp"
+        android:padding="5sp"
+        android:src="@drawable/ic_pdf"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="@id/imgMessage"
+        app:layout_constraintTop_toTopOf="@id/imgMessage"
+        app:tint="?attr/colorOnPrimary" />
+
     <TextView
         android:id="@+id/textDateTime"
         android:layout_width="0dp"
