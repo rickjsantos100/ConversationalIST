@@ -44,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ActivityMapsBinding binding;
     private GeofencingClient geoClient;
     private GeofenceHelper geoHelper;
+    private float radius;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

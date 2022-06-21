@@ -12,7 +12,7 @@ public class Chatroom implements Serializable {
     public boolean isPrivate;
     public String adminRef;
     public String region;
-    public Long radius;
+    public float radius;
 
     public Chatroom() {
     }
@@ -50,7 +50,7 @@ public class Chatroom implements Serializable {
         isPrivate = aPrivate;
     }
 
-    public void setRadius(Long radius) { radius = radius; }
+    public void setRadius(float radius) { this.radius = radius; }
 
     public String getName() {
         return name;

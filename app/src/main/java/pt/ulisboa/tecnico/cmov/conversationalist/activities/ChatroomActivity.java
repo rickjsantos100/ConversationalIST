@@ -66,7 +66,9 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
                     Chatroom chatroom = new Chatroom();
                     chatroom.name = q.getId();
                     chatroom.region = q.getString("region");
-                    chatroom.radius = q.getLong("radius");
+                    if (q.get("radius") != null) {
+                        chatroom.radius = q.getDouble("radius").floatValue();
+                    }
                     chatroom.isPrivate = Boolean.TRUE.equals(q.getBoolean("isPrivate")) || Boolean.TRUE.equals(q.getBoolean("private"));
                     chatroom.adminRef = q.getString("admingRef");
                     chatrooms.add(chatroom);

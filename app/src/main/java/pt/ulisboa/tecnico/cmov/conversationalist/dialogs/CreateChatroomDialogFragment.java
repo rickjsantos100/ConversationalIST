@@ -3,7 +3,9 @@ package pt.ulisboa.tecnico.cmov.conversationalist.dialogs;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -17,6 +19,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
+import pt.ulisboa.tecnico.cmov.conversationalist.activities.MapsActivity;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.CreateChatroomDialogBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
@@ -65,7 +68,19 @@ public class CreateChatroomDialogFragment extends DialogFragment {
                         String name = ((EditText)view.findViewById(R.id.name)).getText().toString();
                         String region = ((EditText)view.findViewById(R.id.region)).getText().toString();
                         Boolean isPrivate = ((RadioButton)view.findViewById(R.id.privateRadioButton)).isChecked();
-                        Long radius = Long.parseLong(((EditText) view.findViewById(R.id.radius)).getText().toString());
+                        Boolean hasGeofencing = ((RadioButton) view.findViewById(R.id.geofencingRadioButton)).isChecked();
+                        EditText radiusInput = (EditText) view.findViewById(R.id.radius);
+                        float radius = 0.0f;
+
+                        if (hasGeofencing) {
+                            if (TextUtils.isEmpty(radiusInput.getText().toString().trim())) {
+                                radiusInput.setError("Radius required when Geofencing is checked!");
+                            } else {
+                                // TODO: Launch map here for geofencing purposes
+                                radius = Float.parseFloat(((EditText) view.findViewById(R.id.radius)).getText().toString());
+                                //startActivity(new Intent(getContext(), MapsActivity.class));
+                            }
+                        }
 
                         if(name.isEmpty()) {
 //                            TODO: Stop this situation from closing the dialog
@@ -78,9 +93,10 @@ public class CreateChatroomDialogFragment extends DialogFragment {
                             Chatroom chatroom = new Chatroom(name,region);
                             chatroom.setPrivate(isPrivate);
                             chatroom.setAdminRef(user.getUsername());
-                            chatroom.setRadius(radius);
 
-                            // TODO: Geofencing stuff here given the radius
+                            if (radius > 0.0f) {
+                                chatroom.setRadius(radius);
+                            }
 
                             firebaseManager.createChatroom(chatroom).addOnFailureListener( task -> {
                                 Toast.makeText(getActivity(), "Error creating chatroom", Toast.LENGTH_SHORT).show();
