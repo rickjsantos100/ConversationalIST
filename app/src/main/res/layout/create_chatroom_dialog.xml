@@ -48,6 +48,25 @@
             android:layout_height="wrap_content"
             android:text="@string/is_private" />
 
+        <RadioButton
+            android:id="@+id/geofencingRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/is_geofenced" />
+
+        <EditText
+            android:id="@+id/radius"
+            android:layout_width="match_parent"
+            android:layout_height="62dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="16dp"
+            android:autofillHints="@string/radius"
+            android:fontFamily="sans-serif"
+            android:hint="@string/radius"
+            android:inputType="text" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,4 +19,6 @@
     <string name="is_private">Privado</string>
     <string name="search">Procura</string>
     <string name="search_rooms">Pesquisa Salas...</string>
+    <string name="is_geofenced">Delimitação Geográfica</string>
+    <string name="radius">Raio</string>
 </resources>

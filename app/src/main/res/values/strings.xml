@@ -21,4 +21,6 @@
     <string name="is_private">Private</string>
     <string name="search">Search</string>
     <string name="search_rooms">Search Rooms...</string>
+    <string name="is_geofenced">Geofenced</string>
+    <string name="radius">Radius</string>
 </resources>

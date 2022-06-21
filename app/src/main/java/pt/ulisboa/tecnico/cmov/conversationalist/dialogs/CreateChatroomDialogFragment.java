@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
@@ -44,6 +45,16 @@ public class CreateChatroomDialogFragment extends DialogFragment {
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
         View view = inflater.inflate(R.layout.create_chatroom_dialog, null);
+        view.findViewById(R.id.radius).setVisibility(View.INVISIBLE);
+        RadioButton geofencing = (RadioButton) view.findViewById(R.id.geofencingRadioButton);
+        geofencing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    view.findViewById(R.id.radius).setVisibility(View.VISIBLE);
+                }
+            }
+        });
         builder.setView(view)
                 // Add action buttons
                 .setPositiveButton(R.string.create_chatroom, new DialogInterface.OnClickListener() {
@@ -54,6 +65,7 @@ public class CreateChatroomDialogFragment extends DialogFragment {
                         String name = ((EditText)view.findViewById(R.id.name)).getText().toString();
                         String region = ((EditText)view.findViewById(R.id.region)).getText().toString();
                         Boolean isPrivate = ((RadioButton)view.findViewById(R.id.privateRadioButton)).isChecked();
+                        Long radius = Long.parseLong(((EditText) view.findViewById(R.id.radius)).getText().toString());
 
                         if(name.isEmpty()) {
 //                            TODO: Stop this situation from closing the dialog
@@ -66,6 +78,9 @@ public class CreateChatroomDialogFragment extends DialogFragment {
                             Chatroom chatroom = new Chatroom(name,region);
                             chatroom.setPrivate(isPrivate);
                             chatroom.setAdminRef(user.getUsername());
+                            chatroom.setRadius(radius);
+
+                            // TODO: Geofencing stuff here given the radius
 
                             firebaseManager.createChatroom(chatroom).addOnFailureListener( task -> {
                                 Toast.makeText(getActivity(), "Error creating chatroom", Toast.LENGTH_SHORT).show();

@@ -50,6 +50,8 @@ public class Chatroom implements Serializable {
         isPrivate = aPrivate;
     }
 
+    public void setRadius(Long radius) { radius = radius; }
+
     public String getName() {
         return name;
     }
