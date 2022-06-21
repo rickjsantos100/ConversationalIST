@@ -3,23 +3,16 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
@@ -37,18 +30,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatAdapter;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityChatBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
-import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 import pt.ulisboa.tecnico.cmov.conversationalist.network.APIClient;
 import pt.ulisboa.tecnico.cmov.conversationalist.network.APIService;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
-import pt.ulisboa.tecnico.cmov.conversationalist.utilities.NotificationHelper;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,12 +46,12 @@ import retrofit2.Response;
 
 public class ChatActivity extends BaseActivity {
     public static final int PICKFILE_RESULT_CODE = 1;
-
+    public static HashMap<String, String> remoteMsgHeaders;
     private ActivityChatBinding binding;
     private FirebaseManager firebaseManager;
     private Chatroom chatroom;
+    private List<String> users;
     private List<Message> messages;
-    private NotificationHelper notificationHelper;
     private ChatAdapter chatAdapter;
     private final EventListener<QuerySnapshot> eventListener = (value, err) -> {
         if (err != null) {
@@ -94,6 +84,15 @@ public class ChatActivity extends BaseActivity {
     private PreferenceManager preferenceManager;
     private FirebaseFirestore db;
 
+    public static HashMap<String, String> getRemoteMsgHeaders() {
+        if (remoteMsgHeaders == null) {
+            remoteMsgHeaders = new HashMap<>();
+            remoteMsgHeaders.put("Authorization", "key=AAAAOQvkomw:APA91bEwQucyF9iLxFYQxobId6YKo0s9YnwxSWHwsFKz3BE10x4Y1rzgg881vqPhVojCSGUA9zHiczimSK0TIJpI4AgrpL1JD75t1drUcNBTxqZkFPzqmRsIuLE0sGytGOsOKFfQS-Kj");
+            remoteMsgHeaders.put("Content-Type", "application/json");
+        }
+        return remoteMsgHeaders;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,13 +112,25 @@ public class ChatActivity extends BaseActivity {
         setListeners();
         loadRoomInfo();
         listenMessages();
-
-
+        getUsersOfRoom();
     }
 
     private void loadRoomInfo() {
         chatroom = (Chatroom) getIntent().getSerializableExtra("chatroom");
         binding.textName.setText(chatroom.name);
+    }
+
+    private void getUsersOfRoom() {
+        users = new ArrayList<>();
+        firebaseManager.getUsersOfRoom(chatroom.name).addOnCompleteListener(v -> {
+            if (v.isSuccessful()) {
+                for (DocumentSnapshot d : v.getResult().getDocuments()) {
+                    if (!d.getId().equals(preferenceManager.getUser().getUsername())) {
+                        users.add(d.getId());
+                    }
+                }
+            }
+        });
     }
 
     private void listenMessages() {
@@ -138,33 +149,77 @@ public class ChatActivity extends BaseActivity {
             db.collection("chats").add(message);
         }
 
-        List<String> offlineUsersUsernames = getOfflineUsers();
+        if (!users.isEmpty()) {
+            for (String user : users) {
+                firebaseManager.getUserInfoById(user).addOnCompleteListener(v -> {
+                    if (v.isSuccessful()) {
+                        try {
+                            Long isOnline = v.getResult().getLong("online");
+                            if (isOnline != null && isOnline == 1) {
+                                return;
+                            }
+                            JSONArray tokens = new JSONArray();
+                            String fcm = v.getResult().getString("fcm");
+                            tokens.put(fcm);
+
+                            JSONObject data = new JSONObject();
+                            data.put("username", preferenceManager.getUser().getUsername());
+                            data.put("chatroom", chatroom.name);
+                            data.put("fcm", preferenceManager.getUser().getFCM());
+                            data.put("message", binding.inputMessage.getText().toString());
+
+                            JSONObject body = new JSONObject();
+                            body.put("data", data);
+                            body.put("registration_ids", tokens);
+
+                            sendNotification(body.toString());
+                        } catch (Exception e) {
+                            //showToast(e.getMessage());
+                        }
+                    }
+                });
+            }
+        }
+
 
         binding.inputMessage.setText(null);
     }
 
-    private List<String> getOfflineUsers() {
-        List<String> offlineUsersUsernames = new ArrayList<>();
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
 
-        db.collection("users")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Map<String, Object> currentUserData = document.getData();
-                                int isOnline = (int) currentUserData.get("online");
-                                if (isOnline == 0) {
-                                    offlineUsersUsernames.add(document.getId());
-                                }
+    private void sendNotification(String messageBody) {
+        APIClient.getClient().create(APIService.class).sendMessage(getRemoteMsgHeaders(), messageBody).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        if (response.body() != null) {
+                            JSONObject responseJSON = new JSONObject(response.body());
+                            JSONArray results = responseJSON.getJSONArray("results");
+                            if (responseJSON.getInt("failure") == 1) {
+                                JSONObject error = (JSONObject) results.get(0);
+                                showToast(error.getString("error"));
+                                return;
                             }
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                });
+                    showToast("Notification sent successfully");
+                } else {
+                    showToast("Error: " + response.code());
+                }
+            }
 
-        return offlineUsersUsernames;
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                showToast(t.getMessage());
+            }
+        });
     }
+
     private void chooseFile() {
         Intent chooseFile = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         chooseFile.setType("*/*");
@@ -240,14 +295,14 @@ public class ChatActivity extends BaseActivity {
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "ConversationalIST");
 //        TODO: translate below
-        String shareMessage= "\nJoin me in " + chatroom.getName() +"\n\n";
+        String shareMessage = "\nJoin me in " + chatroom.getName() + "\n\n";
 
         String shareUrl = Uri.parse("http://www.conversationalist.pt")
                 .buildUpon().appendPath("chat")
                 .appendQueryParameter("id", chatroom.getName())
                 .build().toString();
 
-        shareMessage = shareMessage + shareUrl +"\n\n";
+        shareMessage = shareMessage + shareUrl + "\n\n";
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
         startActivity(Intent.createChooser(shareIntent, "choose one"));
     }

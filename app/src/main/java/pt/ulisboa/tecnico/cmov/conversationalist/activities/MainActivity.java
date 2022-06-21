@@ -45,6 +45,12 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
         handleIntent(getIntent());
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getUserChatrooms();
+    }
+
     private void handleIntent(Intent intent) {
         String appLinkAction = intent.getAction();
         Uri appLinkData = intent.getData();

@@ -146,5 +146,11 @@ public class FirebaseManager {
         reference.update(updates);
     }
 
+    public Task<QuerySnapshot> getUsersOfRoom(String room) {
+        return database.collection("users").whereArrayContains("chatroomsRefs", room).get();
+    }
 
+    public Task<DocumentSnapshot> getUserInfoById(String username) {
+        return database.collection("users").document(username).get();
+    }
 }
