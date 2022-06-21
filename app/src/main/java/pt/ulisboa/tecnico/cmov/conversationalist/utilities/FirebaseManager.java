@@ -1,25 +1,24 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.utilities;
 
 import android.content.Context;
-import android.content.Intent;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.ulisboa.tecnico.cmov.conversationalist.activities.MainActivity;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 
 public class FirebaseManager {
-    private PreferenceManager preferenceManager;
-    private FirebaseFirestore database;
+    private final PreferenceManager preferenceManager;
+    private final FirebaseFirestore database;
 
     public FirebaseManager(Context context) {
         preferenceManager = new PreferenceManager(context);
@@ -27,8 +26,7 @@ public class FirebaseManager {
     }
 
 
-
-    public Task<DocumentSnapshot> getUserFromContext() throws NullPointerException{
+    public Task<DocumentSnapshot> getUserFromContext() throws NullPointerException {
         User user = preferenceManager.getUser();
 //        user can be null hence the nullpointerexcption
         return getUserById(user.getUsername());
@@ -38,9 +36,9 @@ public class FirebaseManager {
     public Task<DocumentSnapshot> getUserById(String username) {
         return database.collection("users").document(username).get().addOnCompleteListener(task -> {
 
-            if(task.isSuccessful()) {
+            if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
-                if(document.exists()){
+                if (document.exists()) {
                     User firestoreUser = document.toObject(User.class);
                     firestoreUser.setUsername(username);
                     preferenceManager.setUser(firestoreUser);
@@ -52,9 +50,27 @@ public class FirebaseManager {
         });
     }
 
-    public Task<Void> createUser(String username) {
+    public Task<QuerySnapshot> getUserIfPasswordMatches(String username, String password) {
+        return database.collection("users").whereEqualTo(FieldPath.documentId(), username).whereEqualTo("password", password).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot snapshot = task.getResult();
+                if (snapshot.getDocuments().size() > 0) {
+                    User firestoreUser = snapshot.getDocuments().get(0).toObject(User.class);
+                    if (firestoreUser != null) {
+                        firestoreUser.setUsername(username);
+                        preferenceManager.setUser(firestoreUser);
+                    }
+                } else {
+                    preferenceManager.setUser(null);
+                }
+            }
+        });
+    }
+
+    public Task<Void> createUser(String username, String password) {
         User newUser = new User(System.currentTimeMillis());
         newUser.setUsername(username);
+        newUser.setPassword(password);
         newUser.setChatroomsRefs(new ArrayList<String>());
 
         return database.collection("users").document(username).set(newUser).addOnCompleteListener(task -> {
@@ -93,10 +109,10 @@ public class FirebaseManager {
         return database.collection("chatrooms").document(chatroom.getName()).set(chatroom).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 User user = preferenceManager.getUser();
-                DocumentReference docRef =  database.collection("users").document(user.getUsername());
+                DocumentReference docRef = database.collection("users").document(user.getUsername());
 
-                user.getChatroomsRefs().add(chatroom.getName().toString());
-                docRef.update("chatroomsRefs" , user.getChatroomsRefs());
+                user.getChatroomsRefs().add(chatroom.getName());
+                docRef.update("chatroomsRefs", user.getChatroomsRefs());
                 preferenceManager.setUser(user);
 
             }

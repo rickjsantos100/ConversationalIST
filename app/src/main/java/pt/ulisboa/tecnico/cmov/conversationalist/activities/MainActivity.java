@@ -3,22 +3,15 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +41,6 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
         setListeners();
         getUserChatrooms();
 
-        getFSMToken();
-
 
         handleIntent(getIntent());
     }
@@ -57,7 +48,7 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
     private void handleIntent(Intent intent) {
         String appLinkAction = intent.getAction();
         Uri appLinkData = intent.getData();
-        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
+        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null) {
             if (preferenceManager.getUser().getUsername() != null) {
                 String chatroomId = appLinkData.getQueryParameter("id");
                 firebaseManager.getChatroom(chatroomId).addOnSuccessListener(documentSnapshot -> {
@@ -72,26 +63,6 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
         }
     }
 
-    private void getFSMToken() {
-        String TAG = "FIREBASE";
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        String token = task.getResult();
-
-                        // Log and toast
-                        Log.w(TAG, "Fetching FCM token" + task.getResult());
-                        Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
 
     private void setListeners() {
         binding.newRoom.setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), ChatroomActivity.class)));

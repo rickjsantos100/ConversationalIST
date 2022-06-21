@@ -23,4 +23,7 @@
     <string name="search_rooms">Search Rooms...</string>
     <string name="is_geofenced">Geofenced</string>
     <string name="radius">Radius</string>
+    <string name="create_new_account">Create New Account</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
 </resources>

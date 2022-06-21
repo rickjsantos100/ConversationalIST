@@ -13,15 +13,25 @@ public class User implements Serializable {
     private String username;
     private Long lastAccess;
     private List<String> chatroomsRefs;
+    private String password;
 
     public User() {
         this.username = "";
         this.lastAccess = 0L;
         this.chatroomsRefs = new ArrayList<>();
-    };
+        password = "";
+    }
 
     public User(Long lastAccess) {
         this.lastAccess = lastAccess;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Long getLastAccess() {

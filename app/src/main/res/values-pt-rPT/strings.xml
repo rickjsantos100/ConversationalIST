@@ -21,4 +21,7 @@
     <string name="search_rooms">Pesquisa Salas...</string>
     <string name="is_geofenced">Delimitação Geográfica</string>
     <string name="radius">Raio</string>
+    <string name="create_new_account">Crie Nova Conta</string>
+    <string name="password">Palavra-Passe</string>
+    <string name="sign_in">Faça Sign In</string>
 </resources>

@@ -4,15 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
-    android:overScrollMode="never"
-    android:padding="24sp"
-    android:scrollbars="none"
-    tools:context=".activities.SignInActivity">
+    tools:context=".activities.SignUpActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20sp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
@@ -20,24 +17,18 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/welcome_back"
+            android:layout_marginTop="20sp"
+            android:text="@string/create_new_account"
             android:textColor="?attr/colorOnSecondary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/login_to_continue"
-            android:textColor="@color/ist_blue"
-            android:textSize="18sp"
-            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/inputUsername"
             android:layout_width="match_parent"
             android:layout_height="45sp"
-            android:layout_marginTop="160sp"
+            android:layout_marginTop="80sp"
             android:background="@color/background_input"
             android:hint="@string/username"
             android:imeOptions="actionNext"
@@ -52,7 +43,7 @@
             android:id="@+id/inputPassword"
             android:layout_width="match_parent"
             android:layout_height="45sp"
-            android:layout_marginTop="40sp"
+            android:layout_marginTop="20sp"
             android:background="@color/background_input"
             android:hint="@string/password"
             android:imeOptions="actionNext"
@@ -70,10 +61,10 @@
             android:animateLayoutChanges="true">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonSignIn"
+                android:id="@+id/buttonSignUp"
                 android:layout_width="match_parent"
                 android:layout_height="50sp"
-                android:text="@string/login"
+                android:text="@string/create_new_account"
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="13sp"
                 android:textStyle="bold"
@@ -90,14 +81,15 @@
         </FrameLayout>
 
         <TextView
-            android:id="@+id/textSignUp"
+            android:id="@+id/textSignIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30sp"
-            android:text="@string/create_new_account"
+            android:text="@string/sign_in"
             android:textColor="?attr/colorOnSecondary"
             android:textSize="13sp"
             android:textStyle="bold" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

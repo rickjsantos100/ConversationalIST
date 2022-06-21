@@ -2,13 +2,13 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivitySignInBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
@@ -31,7 +31,7 @@ public class SignInActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         User user = preferenceManager.getUser();
-        if( user == null) {
+        if (user == null) {
             setListeners();
         } else {
 //            TODO: update the stored user with the most recent user information
@@ -44,29 +44,26 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
+        binding.textSignUp.setOnClickListener(v -> {
+            startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
+        });
         binding.buttonSignIn.setOnClickListener(v -> {
             String username = binding.inputUsername.getText().toString().trim();
-            if (username.isEmpty()) {
+            String password = binding.inputPassword.getText().toString().trim();
+            if (username.isEmpty() || password.isEmpty()) {
                 //                                TODO: change below line to use translations
-                Toast.makeText(getApplicationContext(), "Enter a username", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Confirm Inputs", Toast.LENGTH_SHORT).show();
             } else {
                 loading(true);
-
-                firebaseManager.getUserById(username).addOnCompleteListener(task -> {
+                firebaseManager.getUserIfPasswordMatches(username, password).addOnCompleteListener(task -> {
+                    loading(false);
                     if (task.isSuccessful()) {
-                        DocumentSnapshot document =  task.getResult();
-                        if (document.exists()) {
-                            loading(false);
+                        QuerySnapshot document = task.getResult();
+                        if (document.getDocuments().size() > 0) {
+                            Log.d("POTATO", document.getDocuments().get(0).getId());
                             navigateToMainActivity();
                         } else {
-                            firebaseManager.createUser(username).addOnCompleteListener(tt -> {
-                                if (tt.isSuccessful()) {
-                                    navigateToMainActivity();
-                                } else {
-//                                TODO: change below line to use translations
-                                    Toast.makeText(getApplicationContext(), "Something wrong happened while creating the user", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            Toast.makeText(getApplicationContext(), "Something wrong happened while creating the user", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
