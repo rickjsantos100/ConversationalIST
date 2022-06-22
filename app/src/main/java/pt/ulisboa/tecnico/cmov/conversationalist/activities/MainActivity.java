@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -113,27 +114,74 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         List<String> userChatroomsId = preferenceManager.getUser().getChatroomsRefs();
         List<Chatroom> userChatrooms = new ArrayList<>();
-
         if (userChatroomsId.size() > 0) {
-            database.collection("chatrooms")
-                    .whereIn(FieldPath.documentId(), userChatroomsId)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        loading(false);
-                        QuerySnapshot result = task.getResult();
-                        for (QueryDocumentSnapshot snapshot : result) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                Chatroom chatroom = new Chatroom(snapshot.getId(), snapshot.getString("region"));
-                                userChatrooms.add(chatroom);
-                            }
-                        }
+            if (userChatroomsId.size() > 10) {
+                for (int i = 0; i < userChatroomsId.size() / 10; i++) {
+                    int lowerBound = i * 10;
+                    int upperBound = lowerBound + 9;
+                    database.collection("chatrooms")
+                            .whereIn(FieldPath.documentId(), userChatroomsId.subList(lowerBound, upperBound))
+                            .get()
+                            .addOnCompleteListener(task -> {
+                                loading(false);
+                                QuerySnapshot result = task.getResult();
+                                for (QueryDocumentSnapshot snapshot : result) {
+                                    if (task.isSuccessful() && task.getResult() != null) {
+                                        Chatroom chatroom = new Chatroom(snapshot.getId(), snapshot.getString("region"));
+                                        userChatrooms.add(chatroom);
+                                    }
+                                }
 
-                        if (userChatrooms.size() > 0) {
-                            ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
-                            binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
-                            binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
-                        }
-                    });
+                                if (userChatrooms.size() > 0) {
+                                    ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
+                                    binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+                                    binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
+                                }
+                            });
+                }
+
+                if (userChatrooms.size() % 10 != 0) {
+                    database.collection("chatrooms")
+                            .whereIn(FieldPath.documentId(), userChatroomsId.subList((userChatroomsId.size() / 10) * 10, userChatroomsId.size() - 1))
+                            .get()
+                            .addOnCompleteListener(task -> {
+                                loading(false);
+                                QuerySnapshot result = task.getResult();
+                                for (QueryDocumentSnapshot snapshot : result) {
+                                    if (task.isSuccessful() && task.getResult() != null) {
+                                        Chatroom chatroom = new Chatroom(snapshot.getId(), snapshot.getString("region"));
+                                        userChatrooms.add(chatroom);
+                                    }
+                                }
+
+                                if (userChatrooms.size() > 0) {
+                                    ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
+                                    binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+                                    binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
+                                }
+                            });
+                }
+            } else {
+                    database.collection("chatrooms")
+                            .whereIn(FieldPath.documentId(), userChatroomsId)
+                            .get()
+                            .addOnCompleteListener(task -> {
+                                loading(false);
+                                QuerySnapshot result = task.getResult();
+                                for (QueryDocumentSnapshot snapshot : result) {
+                                    if (task.isSuccessful() && task.getResult() != null) {
+                                        Chatroom chatroom = new Chatroom(snapshot.getId(), snapshot.getString("region"));
+                                        userChatrooms.add(chatroom);
+                                    }
+                                }
+
+                                if (userChatrooms.size() > 0) {
+                                    ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
+                                    binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+                                    binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
+                                }
+                            });
+                    }
         } else {
 //            TODO: Add message to the screen saying the user is not in any room
             loading(false);

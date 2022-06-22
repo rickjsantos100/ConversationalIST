@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -72,20 +73,22 @@ public class CreateChatroomDialogFragment extends DialogFragment {
                         EditText radiusInput = (EditText) view.findViewById(R.id.radius);
                         float radius = 0.0f;
 
-                        if (hasGeofencing) {
-                            if (TextUtils.isEmpty(radiusInput.getText().toString().trim())) {
-                                radiusInput.setError("Radius required when Geofencing is checked!");
-                            } else {
-                                // TODO: Launch map here for geofencing purposes
-                                radius = Float.parseFloat(((EditText) view.findViewById(R.id.radius)).getText().toString());
-                                //startActivity(new Intent(getContext(), MapsActivity.class));
-                            }
-                        }
-
                         if(name.isEmpty()) {
 //                            TODO: Stop this situation from closing the dialog
                             binding.name.setError("Required field");
                         } else {
+                            if (hasGeofencing) {
+                                if (TextUtils.isEmpty(radiusInput.getText().toString().trim())) {
+                                    //TODO: Make this work
+                                    binding.radius.setError("Radius required when Geofencing is checked!");
+                                } else {
+                                    radius = Float.parseFloat(((EditText) view.findViewById(R.id.radius)).getText().toString());
+                                    Intent toGeoIntent = new Intent(getContext(), MapsActivity.class);
+                                    toGeoIntent.putExtra("radius", radius);
+                                    toGeoIntent.putExtra("chatroomGeofence", name);
+                                    startActivity(toGeoIntent);
+                                }
+                            }
 
 //                        TODO:  As of now the chatroom name is the identifier, if we keep that logic we need add that protection.
                             FirebaseFirestore database = FirebaseFirestore.getInstance();

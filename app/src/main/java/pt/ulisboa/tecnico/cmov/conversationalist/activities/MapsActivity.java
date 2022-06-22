@@ -26,9 +26,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityMapsBinding;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.GeofenceHelper;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
@@ -37,14 +45,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
     private static final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
 
-    private static final int GEOFENCE_RADIUS = 200;
-    private static final String GEOFENCE_ID = "SOME_GEOFENCE_ID";
-
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private GeofencingClient geoClient;
     private GeofenceHelper geoHelper;
-    private float radius;
+    private String chatroomGeofence = "DEFAULT";
+    private float radius = 200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +64,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
+
+        if (getIntent().getSerializableExtra("radius") != null && getIntent().getSerializableExtra("chatroomGeofence") != null) {
+            this.radius = (float) getIntent().getSerializableExtra("radius");
+            this.chatroomGeofence = (String) getIntent().getSerializableExtra("chatroomGeofence");
+        }
 
         geoClient = LocationServices.getGeofencingClient(this);
         geoHelper = new GeofenceHelper(this);
@@ -135,23 +146,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void tryAddingGeofence(LatLng latLng) {
+    private void tryAddingGeofence(LatLng  latLng) {
         mMap.clear();
         addMarker(latLng);
-        addCircle(latLng, GEOFENCE_RADIUS);
-        addGeofence(latLng, GEOFENCE_RADIUS);
+        addCircle(latLng, this.radius);
+        addGeofence(latLng, this.radius, this.chatroomGeofence);
     }
 
     @SuppressLint("MissingPermission")
-    private void addGeofence(LatLng latLng, float radius) {
+    private void addGeofence(LatLng latLng, float radius, String chatroomGeofence) {
         // TODO: change geofence id
-        // TODO: change transitions to actually trigger correctly
-        Geofence geofence = geoHelper.getGeofence(GEOFENCE_ID, latLng, radius, Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT);
+        Geofence geofence = geoHelper.getGeofence(chatroomGeofence, latLng, radius, Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT);
         GeofencingRequest geoRequest = geoHelper.getGeofenceRequest(geofence);
         PendingIntent pendingItent = geoHelper.getPendingIntent();
         // permission is checked elsewhere
         geoClient.addGeofences(geoRequest, pendingItent).addOnSuccessListener(v -> {
             Log.d(TAG, "onSuccess: Geofence added");
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            Map<String, Object> geoData = new HashMap<>();
+            geoData.put("chatroom", chatroomGeofence);
+            geoData.put("radius", radius);
+            geoData.put("latLng", latLng);
+
+            db.collection("geofences").add(geoData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error adding document", e);
+                }
+            });
+            onBackPressed();
         }).addOnFailureListener(e -> {
             String err = geoHelper.getErrorString(e);
             Log.d(TAG, "onFailure: " + err);
