@@ -121,12 +121,12 @@ public class FirebaseManager {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    Log.d("HEYEELE", "HELLEOEOEO");
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         List<String> userGeos = user.getGeofencesRefs();
                         userGeos.add((String) document.get("chatroom"));
                         user.setGeofencesRefs(userGeos);
+                        docRef.update("geofencesRefs", FieldValue.arrayUnion(document.get("chatroom")));
                     } else {
                         Log.d("THIS", "No such document");
                     }
@@ -148,25 +148,6 @@ public class FirebaseManager {
                 user.getChatroomsRefs().add(chatroom.getName());
                 docRef.update("chatroomsRefs", user.getChatroomsRefs());
                 preferenceManager.setUser(user);
-                DocumentReference docGeosRef = database.collection("geofences").document(chatroom.getName());
-                docGeosRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Log.d("HEYEELE", "HELLEOEOEO");
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                List<String> userGeos = user.getGeofencesRefs();
-                                userGeos.add((String) document.get("chatroom"));
-                                user.setGeofencesRefs(userGeos);
-                            } else {
-                                Log.d("THIS", "No such document");
-                            }
-                        } else {
-                            Log.d("THIS", "get failed with ", task.getException());
-                        }
-                    }
-                });
             }
         });
     }

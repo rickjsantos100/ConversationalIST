@@ -26,18 +26,25 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityMapsBinding;
+import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.GeofenceHelper;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
     private static final String TAG = "MapsActivity";
@@ -159,6 +166,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Geofence geofence = geoHelper.getGeofence(chatroomGeofence, latLng, radius, Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT);
         GeofencingRequest geoRequest = geoHelper.getGeofenceRequest(geofence);
         PendingIntent pendingItent = geoHelper.getPendingIntent();
+        PreferenceManager preferenceManager = new PreferenceManager(getApplicationContext());
+
         // permission is checked elsewhere
         geoClient.addGeofences(geoRequest, pendingItent).addOnSuccessListener(v -> {
             Log.d(TAG, "onSuccess: Geofence added");
@@ -171,6 +180,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             geoData.put("latLng", latLng);
 
             db.collection("geofences").document(chatroomGeofence).set(geoData);
+            User currentUser = preferenceManager.getUser();
+            List<String> userGeos = currentUser.getGeofencesRefs();
+            userGeos.add(chatroomGeofence);
+            currentUser.setGeofencesRefs(userGeos);
+            db.collection("users").document(currentUser.getUsername()).update("geofencesRefs", FieldValue.arrayUnion(chatroomGeofence));
             onBackPressed();
         }).addOnFailureListener(e -> {
             String err = geoHelper.getErrorString(e);
