@@ -4,10 +4,12 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -16,6 +18,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ItemContainerReceivedMessageBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ItemContainerReceivedMessageImageBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ItemContainerSentMessageBinding;
@@ -110,7 +113,65 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    static class SentMessageViewHolder extends RecyclerView.ViewHolder {
+    static class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
+        public Message message;
+
+        CustomViewHolder (View view) {
+            super(view);
+            view.setOnLongClickListener(this);
+
+        }
+
+
+        @Override
+        public boolean onLongClick(View view) {
+
+            //creating a popup menu
+            PopupMenu popup = new PopupMenu(view.getContext(), view);
+            //inflating menu from xml resource
+            popup.inflate(R.menu.message_more_options_menu);
+            //adding click listener
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.shareMessage:
+                            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "ConversationalIST");
+
+                            if (message.media.equals("text")) {
+                                shareIntent.setType("text/plain");
+                                String shareMessage = message.value;
+                                shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+
+                            } else {
+
+                                Uri uri = Uri.parse(message.value);
+
+                                ContentResolver cR = view.getContext().getContentResolver();
+                                String type = cR.getType(uri);
+
+                                shareIntent.setType(type);
+                                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                java.lang.SecurityException: UID 10492 does not have permission to content://com.android.providers.media.documents/document/image%3A39485 [user 0]; you could obtain access using ACTION_OPEN_DOCUMENT or related APIs
+
+
+                            }
+                            view.getContext().startActivity(Intent.createChooser(shareIntent, "choose one"));
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+            });
+            popup.show();
+            return true;
+        }
+
+    }
+
+    static class SentMessageViewHolder extends CustomViewHolder  {
         private final ItemContainerSentMessageBinding binding;
 
         SentMessageViewHolder(ItemContainerSentMessageBinding itemContainerSentMessageBinding) {
@@ -119,13 +180,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
+            this.message = message;
             binding.textMessage.setText(message.value);
-//            TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
             binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
         }
+
+
     }
 
-    static class SentMessageImageViewHolder extends RecyclerView.ViewHolder {
+    static class SentMessageImageViewHolder extends CustomViewHolder {
         private final ItemContainerSentMessageImageBinding binding;
 
         SentMessageImageViewHolder(ItemContainerSentMessageImageBinding itemContainerSentMessageImageBinding) {
@@ -134,6 +197,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
+            this.message = message;
 
             // get firebase image file reference
             Uri uri = Uri.parse(message.value);
@@ -143,7 +207,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             StorageReference storageReference = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com").getReference("images/" + uri.getLastPathSegment());
 
-            if (type.equals("application/pdf")) {
+            if (type != null && type.equals("application/pdf")) {
                 binding.imagePDF.setVisibility(View.VISIBLE);
                 binding.imagePDF.setOnClickListener(v -> {
                     storageReference.getDownloadUrl().addOnSuccessListener(t -> {
@@ -158,13 +222,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         .load(storageReference)
                         .into(binding.imgMessage);
 
-//          TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
             }
             binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
         }
     }
 
-    static class ReceivedMessageImageViewHolder extends RecyclerView.ViewHolder {
+    static class ReceivedMessageImageViewHolder extends CustomViewHolder {
         private final ItemContainerReceivedMessageImageBinding binding;
 
         ReceivedMessageImageViewHolder(ItemContainerReceivedMessageImageBinding itemContainerReceivedMessageImageBinding) {
@@ -173,6 +236,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
+            this.message = message;
+
             // get firebase image file reference
             Uri uri = Uri.parse(message.value);
 
@@ -196,12 +261,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         .load(storageReference)
                         .into(binding.imgMessage);
             }
-//          TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
+
             binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
         }
     }
 
-    static class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
+    static class ReceivedMessageViewHolder extends CustomViewHolder {
         private final ItemContainerReceivedMessageBinding binding;
 
         ReceivedMessageViewHolder(ItemContainerReceivedMessageBinding itemContainerReceivedMessageBinding) {
@@ -210,8 +275,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
+            this.message = message;
+
             binding.textMessage.setText(message.value);
-//            TODO: change the implementation below to not be deprecated ,possibly use Calendar instead of Date
             binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
         }
     }
