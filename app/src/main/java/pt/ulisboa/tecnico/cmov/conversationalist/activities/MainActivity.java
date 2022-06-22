@@ -125,7 +125,8 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
                     fetchUserChatroomsByBoundary(database, userChatroomsId, userChatrooms, lowerBound, upperBound);
                 }
 
-                if (userChatrooms.size() % 10 != 0) {
+                if (userChatroomsId.size() % 10 != 0) {
+                    Log.d("ENTREI", "trolarorororo");
                     lowerBound = userChatroomsId.size() / 10 * 10;
                     upperBound = userChatroomsId.size();
                     fetchUserChatroomsByBoundary(database, userChatroomsId, userChatrooms, lowerBound, upperBound);
