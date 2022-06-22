@@ -13,6 +13,7 @@ public class User implements Serializable {
     private String username;
     private Long lastAccess;
     private List<String> chatroomsRefs;
+    private List<String> geofencesRefs;
     private String password;
     private String fcm;
 
@@ -20,6 +21,7 @@ public class User implements Serializable {
         this.username = "";
         this.lastAccess = 0L;
         this.chatroomsRefs = new ArrayList<>();
+        this.geofencesRefs = new ArrayList<>();
         this.password = "";
         this.fcm = "";
     }
@@ -63,6 +65,10 @@ public class User implements Serializable {
     public List<String> getChatroomsRefs() {
         return chatroomsRefs;
     }
+
+    public List<String> getGeofencesRefs() { return geofencesRefs; }
+
+    public void setGeofencesRefs(List<String> geofencesRefs) { this.geofencesRefs = geofencesRefs; }
 
     public void setChatroomsRefs(List<String> chatroomsRefs) {
         this.chatroomsRefs = chatroomsRefs;

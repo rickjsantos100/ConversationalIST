@@ -170,17 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             geoData.put("radius", radius);
             geoData.put("latLng", latLng);
 
-            db.collection("geofences").add(geoData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                @Override
-                public void onSuccess(DocumentReference documentReference) {
-                    Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.w(TAG, "Error adding document", e);
-                }
-            });
+            db.collection("geofences").document(chatroomGeofence).set(geoData);
             onBackPressed();
         }).addOnFailureListener(e -> {
             String err = geoHelper.getErrorString(e);

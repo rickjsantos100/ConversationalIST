@@ -71,7 +71,9 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
                     }
                     chatroom.isPrivate = Boolean.TRUE.equals(q.getBoolean("isPrivate")) || Boolean.TRUE.equals(q.getBoolean("private"));
                     chatroom.adminRef = q.getString("admingRef");
-                    chatrooms.add(chatroom);
+                    if (!chatroom.isPrivate) {
+                        chatrooms.add(chatroom);
+                    }
                 }
                 if (chatrooms.size() > 0) {
                     ChatroomAdapter chatroomAdapter = new ChatroomAdapter(chatrooms, this);
