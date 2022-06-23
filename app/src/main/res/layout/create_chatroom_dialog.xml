@@ -28,7 +28,7 @@
             android:autofillHints="@string/chatroom_name"
             android:hint="@string/chatroom_name"
             android:inputType="text" />
-        
+
         <RadioButton
             android:id="@+id/privateRadioButton"
             android:layout_width="match_parent"
@@ -52,7 +52,7 @@
             android:autofillHints="@string/radius"
             android:fontFamily="sans-serif"
             android:hint="@string/radius"
-            android:inputType="text" />
+            android:inputType="numberDecimal" />
 
     </LinearLayout>
 
