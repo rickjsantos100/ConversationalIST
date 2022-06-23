@@ -34,7 +34,7 @@ public class SignInActivity extends AppCompatActivity {
             setListeners();
         } else {
 //            TODO: update the stored user with the most recent user information
-            firebaseManager.getUserById(user.getUsername()).addOnCompleteListener(task -> {
+            firebaseManager.getUserById(user.username).addOnCompleteListener(task -> {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -61,7 +61,7 @@ public class SignInActivity extends AppCompatActivity {
                         if (document.getDocuments().size() > 0) {
                             navigateToMainActivity();
                         } else {
-                            Toast.makeText(getApplicationContext(), "Something wrong happened while creating the user", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Something wrong happened with the log in", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

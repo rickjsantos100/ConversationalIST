@@ -10,6 +10,7 @@ import android.view.View;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -24,6 +25,7 @@ import pt.ulisboa.tecnico.cmov.conversationalist.dialogs.CreateChatroomDialogFra
 import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class ChatroomActivity extends BaseActivity implements ChatroomListener {
 
@@ -31,6 +33,7 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
     private ActivityChatroomBinding binding;
     private FirebaseManager firebaseManager;
     private List<Chatroom> chatrooms;
+    private PreferenceManager preferenceManager;
 
     private String sharedText;
     private Uri sharedUri;
@@ -41,6 +44,7 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
         binding = ActivityChatroomBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         firebaseManager = new FirebaseManager(getApplicationContext());
+        preferenceManager = new PreferenceManager(this);
         loading(false);
 
         this.chatrooms = new ArrayList<>();
@@ -107,38 +111,72 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
         });
     }
 
+    private void fetchUserChatroomsByBoundary(FirebaseFirestore database, List<String> userChatroomsId, List<Chatroom> userChatrooms, int lowerBound, int upperBound) {
+        database.collection("chatrooms")
+                .whereNotIn(FieldPath.documentId(), userChatroomsId.subList(lowerBound, upperBound))
+                .get()
+                .addOnCompleteListener(task -> {
+                    loading(false);
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        for (QueryDocumentSnapshot q : task.getResult()) {
+                            Chatroom chatroom = new Chatroom();
+                            chatroom.name = q.getId();
+                            if (q.get("radius") != null) {
+                                chatroom.radius = q.getDouble("radius").floatValue();
+                            }
+                            chatroom.isPrivate = Boolean.TRUE.equals(q.getBoolean("isPrivate")) || Boolean.TRUE.equals(q.getBoolean("private"));
+                            chatroom.adminRef = q.getString("admingRef");
+                            if (!chatroom.isPrivate) {
+                                userChatrooms.add(chatroom);
+                            }
+                        }
+                        if (userChatrooms.size() > 0) {
+                            ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
+                            binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+                            binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
+                        } else {
+                            showErrorMessage();
+                        }
+                    } else {
+                        showErrorMessage();
+                    }
+                });
+    }
+
     private void getChatrooms() {
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
-        database.collection("chatrooms").get().addOnCompleteListener(task -> {
-            loading(false);
-            if (task.isSuccessful() && task.getResult() != null) {
-                chatrooms = new ArrayList<>();
-                for (QueryDocumentSnapshot q : task.getResult()) {
-                    Chatroom chatroom = new Chatroom();
-                    chatroom.name = q.getId();
-                    chatroom.region = q.getString("region");
-                    if (q.get("radius") != null) {
-                        chatroom.radius = q.getDouble("radius").floatValue();
-                    }
-                    chatroom.isPrivate = Boolean.TRUE.equals(q.getBoolean("isPrivate")) || Boolean.TRUE.equals(q.getBoolean("private"));
-                    chatroom.adminRef = q.getString("admingRef");
-                    if (!chatroom.isPrivate) {
-                        chatrooms.add(chatroom);
-                    }
+        List<Chatroom> userChatroomsId = preferenceManager.getUser().chatroomsRefs;
+        List<String> userChatroomsIdString = new ArrayList<>();
+        for (Chatroom c : userChatroomsId) {
+            userChatroomsIdString.add(c.name);
+        }
+        List<Chatroom> userChatrooms = new ArrayList<>();
+
+        if (userChatroomsId.size() > 0) {
+            int lowerBound = 0;
+            int upperBound = userChatroomsId.size();
+            if (userChatroomsId.size() > 10) {
+                for (int i = 0; i < userChatroomsId.size() / 10; i++) {
+                    lowerBound = i * 10;
+                    upperBound = lowerBound + 10;
+                    fetchUserChatroomsByBoundary(database, userChatroomsIdString, userChatrooms, lowerBound, upperBound);
                 }
-                if (chatrooms.size() > 0) {
-                    ChatroomAdapter chatroomAdapter = new ChatroomAdapter(chatrooms, this);
-                    binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
-                    binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
-                } else {
-                    showErrorMessage();
+
+                if (userChatroomsId.size() % 10 != 0) {
+                    lowerBound = userChatroomsId.size() / 10 * 10;
+                    upperBound = userChatroomsId.size();
+                    fetchUserChatroomsByBoundary(database, userChatroomsIdString, userChatrooms, lowerBound, upperBound);
                 }
             } else {
-                showErrorMessage();
+                fetchUserChatroomsByBoundary(database, userChatroomsIdString, userChatrooms, lowerBound, upperBound);
             }
-        });
+        } else {
+//            TODO: Add message to the screen saying the user is not in any room
+            loading(false);
+        }
     }
+
 
     private void showErrorMessage() {
         binding.textErrorMessage.setText(String.format("%s", "No chatroom available"));
@@ -156,7 +194,7 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
 
     @Override
     public void onChatroomClicked(Chatroom chatroom) {
-        firebaseManager.joinChatroom(chatroom.getName());
+        firebaseManager.joinChatroom(chatroom);
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra("chatroom", chatroom);
         intent.putExtra("sharedText", this.sharedText);

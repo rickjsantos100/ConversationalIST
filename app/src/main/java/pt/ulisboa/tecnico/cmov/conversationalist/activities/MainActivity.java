@@ -8,13 +8,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
-import com.google.firebase.firestore.FieldPath;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatroomAdapter;
@@ -56,7 +51,7 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
         String appLinkAction = intent.getAction();
         Uri appLinkData = intent.getData();
         if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null) {
-            if (preferenceManager.getUser().getUsername() != null) {
+            if (preferenceManager.getUser().username != null) {
                 String chatroomId = appLinkData.getQueryParameter("id");
                 firebaseManager.getChatroom(chatroomId).addOnSuccessListener(documentSnapshot -> {
                     Chatroom chatroom = documentSnapshot.toObject(Chatroom.class);
@@ -90,7 +85,7 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
     }
 
     private void loadUserDetails() {
-        binding.textName.setText(preferenceManager.getUser().getUsername());
+        binding.textName.setText(preferenceManager.getUser().username);
     }
 
     private void updateToken(String token) {
@@ -110,55 +105,13 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
     }
 
     private void getUserChatrooms() {
-        loading(true);
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-        List<String> userChatroomsId = preferenceManager.getUser().getChatroomsRefs();
-        List<Chatroom> userChatrooms = new ArrayList<>();
-
-        if (userChatroomsId.size() > 0) {
-            int lowerBound = 0;
-            int upperBound = userChatroomsId.size();
-            if (userChatroomsId.size() > 10) {
-                for (int i = 0; i < userChatroomsId.size() / 10; i++) {
-                    lowerBound = i * 10;
-                    upperBound = lowerBound + 10;
-                    fetchUserChatroomsByBoundary(database, userChatroomsId, userChatrooms, lowerBound, upperBound);
-                }
-
-                if (userChatroomsId.size() % 10 != 0) {
-                    lowerBound = userChatroomsId.size() / 10 * 10;
-                    upperBound = userChatroomsId.size();
-                    fetchUserChatroomsByBoundary(database, userChatroomsId, userChatrooms, lowerBound, upperBound);
-                }
-            } else {
-                fetchUserChatroomsByBoundary(database, userChatroomsId, userChatrooms, lowerBound, upperBound);
-            }
-        } else {
-//            TODO: Add message to the screen saying the user is not in any room
-            loading(false);
+        List<Chatroom> userChatrooms = preferenceManager.getUser().chatroomsRefs;
+        if (userChatrooms.size() > 0) {
+            ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
+            binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+            binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
         }
-    }
-
-    private void fetchUserChatroomsByBoundary(FirebaseFirestore database, List<String> userChatroomsId, List<Chatroom> userChatrooms, int lowerBound, int upperBound) {
-        database.collection("chatrooms")
-                .whereIn(FieldPath.documentId(), userChatroomsId.subList(lowerBound, upperBound))
-                .get()
-                .addOnCompleteListener(task -> {
-                    loading(false);
-                    QuerySnapshot result = task.getResult();
-                    for (QueryDocumentSnapshot snapshot : result) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            Chatroom chatroom = new Chatroom(snapshot.getId(), snapshot.getString("region"));
-                            userChatrooms.add(chatroom);
-                        }
-                    }
-
-                    if (userChatrooms.size() > 0) {
-                        ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
-                        binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
-                        binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
-                    }
-                });
+        loading(false);
     }
 
     private void loading(Boolean isLoading) {

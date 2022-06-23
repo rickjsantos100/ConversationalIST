@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.adapters;
 
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ItemContainerChatroomBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
@@ -57,7 +59,8 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.Chatro
             binding.textName.setText(chatroom.name);
             binding.imageChat.setText(chatroom.name);
             // maybe add other things like private here
-            binding.textOther.setText(chatroom.region);
+            Resources res = binding.getRoot().getResources();
+            binding.textOther.setText(chatroom.isPrivate ? res.getString(R.string.is_private) : res.getString(R.string.is_not_private));
 
             binding.getRoot().setOnClickListener(v -> chatroomListener.onChatroomClicked(chatroom));
         }

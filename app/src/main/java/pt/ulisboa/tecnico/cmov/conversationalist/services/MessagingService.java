@@ -35,8 +35,8 @@ public class MessagingService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
         User user = new User();
-        user.setUsername(message.getData().get("username"));
-        user.setFCM(message.getData().get("fcm"));
+        user.username = message.getData().get("username");
+        user.fcm = message.getData().get("fcm");
         Chatroom chatroom = new Chatroom();
         chatroom.name = message.getData().get("chatroom");
 

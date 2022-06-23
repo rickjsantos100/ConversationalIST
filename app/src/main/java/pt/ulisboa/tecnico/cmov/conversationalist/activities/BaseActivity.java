@@ -20,7 +20,7 @@ public class BaseActivity extends AppCompatActivity {
         PreferenceManager preferenceManager = new PreferenceManager(getApplicationContext());
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         docRef = db.collection("users")
-                .document(preferenceManager.getUser().getUsername());
+                .document(preferenceManager.getUser().username);
     }
 
     @Override

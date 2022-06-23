@@ -10,12 +10,12 @@ public class User implements Serializable {
 
     //    Hidden firestore id field
     @DocumentId
-    private String username;
-    private Long lastAccess;
-    private List<String> chatroomsRefs;
-    private List<String> geofencesRefs;
-    private String password;
-    private String fcm;
+    public String username;
+    public Long lastAccess;
+    public List<Chatroom> chatroomsRefs;
+    public List<GeoCage> geofencesRefs;
+    public String password;
+    public String fcm;
 
     public User() {
         this.username = "";
@@ -26,51 +26,4 @@ public class User implements Serializable {
         this.fcm = "";
     }
 
-    public User(Long lastAccess) {
-        this.lastAccess = lastAccess;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFCM() {
-        return this.fcm;
-    }
-
-    public void setFCM(String fcm) {
-        this.fcm = fcm;
-    }
-
-    public Long getLastAccess() {
-        return lastAccess;
-    }
-
-    public void setLastAccess(Long lastAccess) {
-        this.lastAccess = lastAccess;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public List<String> getChatroomsRefs() {
-        return chatroomsRefs;
-    }
-
-    public List<String> getGeofencesRefs() { return geofencesRefs; }
-
-    public void setGeofencesRefs(List<String> geofencesRefs) { this.geofencesRefs = geofencesRefs; }
-
-    public void setChatroomsRefs(List<String> chatroomsRefs) {
-        this.chatroomsRefs = chatroomsRefs;
-    }
 }

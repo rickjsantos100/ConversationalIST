@@ -6,24 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.activities.MapsActivity;
@@ -51,63 +40,56 @@ public class CreateChatroomDialogFragment extends DialogFragment {
         // Get the layout inflater
         LayoutInflater inflater = requireActivity().getLayoutInflater();
 
-
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        View view = inflater.inflate(R.layout.create_chatroom_dialog, null);
-        view.findViewById(R.id.radius).setVisibility(View.INVISIBLE);
-        RadioButton geofencing = (RadioButton) view.findViewById(R.id.geofencingRadioButton);
+        binding.radius.setVisibility(View.INVISIBLE);
+        RadioButton geofencing = binding.geofencingRadioButton;
         geofencing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    view.findViewById(R.id.radius).setVisibility(View.VISIBLE);
+                if (isChecked) {
+                    binding.radius.setVisibility(View.VISIBLE);
                 }
             }
         });
-        builder.setView(view)
+        builder.setView(binding.getRoot())
                 // Add action buttons
                 .setPositiveButton(R.string.create_chatroom, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-
-//                        TODO: Fix, the binding isn't working properly, name is always coming empty
-                        String name = ((EditText)view.findViewById(R.id.name)).getText().toString();
-                        String region = ((EditText)view.findViewById(R.id.region)).getText().toString();
-                        Boolean isPrivate = ((RadioButton)view.findViewById(R.id.privateRadioButton)).isChecked();
-                        Boolean hasGeofencing = ((RadioButton) view.findViewById(R.id.geofencingRadioButton)).isChecked();
-                        EditText radiusInput = (EditText) view.findViewById(R.id.radius);
+                        String name = binding.name.getText().toString().trim();
+                        Boolean isPrivate = binding.privateRadioButton.isChecked();
+                        Boolean hasGeofencing = binding.geofencingRadioButton.isChecked();
+                        String radiusInput = binding.radius.getText().toString().trim();
                         float radius = 0.0f;
 
-                        if(name.isEmpty()) {
+                        User user = preferenceManager.getUser();
+                        Chatroom chatroom = new Chatroom(name);
+                        chatroom.isPrivate = isPrivate;
+                        chatroom.name = name;
+                        chatroom.adminRef = user.username;
+
+                        if (name.isEmpty()) {
 //                            TODO: Stop this situation from closing the dialog
                             binding.name.setError("Required field");
                         } else {
                             if (hasGeofencing) {
-                                if (TextUtils.isEmpty(radiusInput.getText().toString().trim())) {
+                                if (TextUtils.isEmpty(radiusInput)) {
                                     //TODO: Make this work
                                     binding.radius.setError("Radius required when Geofencing is checked!");
                                 } else {
-                                    radius = Float.parseFloat(((EditText) view.findViewById(R.id.radius)).getText().toString());
+                                    radius = Float.parseFloat(radiusInput);
                                     Intent toGeoIntent = new Intent(getContext(), MapsActivity.class);
                                     toGeoIntent.putExtra("radius", radius);
-                                    toGeoIntent.putExtra("chatroomGeofence", name);
+                                    toGeoIntent.putExtra("chatroomGeofence", chatroom);
                                     startActivity(toGeoIntent);
                                 }
                             }
 
-//                        TODO:  As of now the chatroom name is the identifier, if we keep that logic we need add that protection.
-                            FirebaseFirestore database = FirebaseFirestore.getInstance();
-                            User user = preferenceManager.getUser();
-                            Chatroom chatroom = new Chatroom(name,region);
-                            chatroom.setPrivate(isPrivate);
-                            chatroom.setAdminRef(user.getUsername());
 
                             if (radius > 0.0f) {
-                                chatroom.setRadius(radius);
+                                chatroom.radius = radius;
                             }
 
-                            firebaseManager.createChatroom(chatroom).addOnFailureListener( task -> {
+                            firebaseManager.createChatroom(chatroom).addOnFailureListener(task -> {
                                 Toast.makeText(getActivity(), "Error creating chatroom", Toast.LENGTH_SHORT).show();
                             });
                         }
@@ -115,7 +97,9 @@ public class CreateChatroomDialogFragment extends DialogFragment {
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        CreateChatroomDialogFragment.this.getDialog().cancel();
+                        if (CreateChatroomDialogFragment.this.getDialog() != null) {
+                            CreateChatroomDialogFragment.this.getDialog().cancel();
+                        }
                     }
                 });
         builder.setTitle(R.string.create_chatroom_dialog_tittle);

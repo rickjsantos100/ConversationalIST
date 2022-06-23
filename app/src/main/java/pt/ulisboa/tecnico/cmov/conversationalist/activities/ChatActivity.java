@@ -112,7 +112,7 @@ public class ChatActivity extends BaseActivity {
 
         chatAdapter = new ChatAdapter(
                 messages,
-                preferenceManager.getUser().getUsername()
+                preferenceManager.getUser().username
         );
         binding.chatRecyclerView.setAdapter(chatAdapter);
         db = FirebaseFirestore.getInstance();
@@ -140,7 +140,7 @@ public class ChatActivity extends BaseActivity {
         firebaseManager.getUsersOfRoom(chatroom.name).addOnCompleteListener(v -> {
             if (v.isSuccessful()) {
                 for (DocumentSnapshot d : v.getResult().getDocuments()) {
-                    if (!d.getId().equals(preferenceManager.getUser().getUsername())) {
+                    if (!d.getId().equals(preferenceManager.getUser().username)) {
                         users.add(d.getId());
                     }
                 }
@@ -155,7 +155,7 @@ public class ChatActivity extends BaseActivity {
     private void sendMessage(String type, String content) {
         if (!content.matches("") && !content.trim().isEmpty()) {
             HashMap<String, Object> message = new HashMap<>();
-            message.put("sender", preferenceManager.getUser().getUsername());
+            message.put("sender", preferenceManager.getUser().username);
             message.put("chatroom", chatroom.name);
             message.put("media", type);
             message.put("value", content);
@@ -178,9 +178,9 @@ public class ChatActivity extends BaseActivity {
                             tokens.put(fcm);
 
                             JSONObject data = new JSONObject();
-                            data.put("username", preferenceManager.getUser().getUsername());
+                            data.put("username", preferenceManager.getUser().username);
                             data.put("chatroom", chatroom.name);
-                            data.put("fcm", preferenceManager.getUser().getFCM());
+                            data.put("fcm", preferenceManager.getUser().fcm);
                             data.put("message", binding.inputMessage.getText().toString());
 
                             JSONObject body = new JSONObject();
@@ -307,7 +307,7 @@ public class ChatActivity extends BaseActivity {
     }
 
     private void leaveChatroom() {
-        firebaseManager.leaveChatroom(chatroom.getName());
+        firebaseManager.leaveChatroom(chatroom.name);
         onBackPressed();
     }
 
@@ -316,11 +316,11 @@ public class ChatActivity extends BaseActivity {
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "ConversationalIST");
 //        TODO: translate below
-        String shareMessage = "\nJoin me in " + chatroom.getName() + "\n\n";
+        String shareMessage = "\nJoin me in " + chatroom.name + "\n\n";
 
         String shareUrl = Uri.parse("http://www.conversationalist.pt")
                 .buildUpon().appendPath("chat")
-                .appendQueryParameter("id", chatroom.getName())
+                .appendQueryParameter("id", chatroom.name)
                 .build().toString();
 
         shareMessage = shareMessage + shareUrl + "\n\n";

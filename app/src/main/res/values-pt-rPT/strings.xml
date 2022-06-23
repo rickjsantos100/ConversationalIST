@@ -25,4 +25,5 @@
     <string name="password">Palavra-Passe</string>
     <string name="sign_in">Faça Sign In</string>
     <string name="loading">Carregando</string>
+    <string name="is_not_private">Não é Privado</string>
 </resources>

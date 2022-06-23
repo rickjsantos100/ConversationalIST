@@ -3,9 +3,6 @@ package pt.ulisboa.tecnico.cmov.conversationalist.utilities;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -19,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
+import pt.ulisboa.tecnico.cmov.conversationalist.models.GeoCage;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 
@@ -37,7 +35,7 @@ public class FirebaseManager {
     public Task<DocumentSnapshot> getUserFromContext() throws NullPointerException {
         User user = preferenceManager.getUser();
 //        user can be null hence the nullpointerexcption
-        return getUserById(user.getUsername());
+        return getUserById(user.username);
 
     }
 
@@ -48,7 +46,7 @@ public class FirebaseManager {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
                     User firestoreUser = document.toObject(User.class);
-                    firestoreUser.setUsername(username);
+                    firestoreUser.username = username;
                     preferenceManager.setUser(firestoreUser);
                 }
 //                User firestoreUser = new User(task.getResult().getData()
@@ -65,7 +63,7 @@ public class FirebaseManager {
                 if (snapshot.getDocuments().size() > 0) {
                     User firestoreUser = snapshot.getDocuments().get(0).toObject(User.class);
                     if (firestoreUser != null) {
-                        firestoreUser.setUsername(username);
+                        firestoreUser.username = username;
                         preferenceManager.setUser(firestoreUser);
                     }
                 } else {
@@ -76,11 +74,11 @@ public class FirebaseManager {
     }
 
     public Task<Void> createUser(String username, String password) {
-        User newUser = new User(System.currentTimeMillis());
-        newUser.setUsername(username);
-        newUser.setPassword(password);
-        newUser.setChatroomsRefs(new ArrayList<String>());
-        newUser.setGeofencesRefs(new ArrayList<String>());
+        User newUser = new User();
+        newUser.username = username;
+        newUser.password = password;
+        newUser.chatroomsRefs = new ArrayList<>();
+        newUser.geofencesRefs = new ArrayList<>();
 
         return database.collection("users").document(username).set(newUser).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -92,62 +90,55 @@ public class FirebaseManager {
     public void leaveChatroom(String chatroomId) {
         User user = preferenceManager.getUser();
 //      Update the database user
-        DocumentReference docRef = database.collection("users").document(user.getUsername());
+        DocumentReference docRef = database.collection("users").document(user.username);
         docRef.update("chatroomsRefs", FieldValue.arrayRemove(chatroomId));
 //      Update the state user
-        List<String> userChatrooms = user.getChatroomsRefs();
-        userChatrooms.remove(chatroomId);
-        List<String> userGeofences = user.getGeofencesRefs();
-        if (userGeofences.contains(chatroomId)) {
-            userGeofences.remove(chatroomId);
-            user.setGeofencesRefs(userGeofences);
-        }
-        docRef.update("geofencesRefs", FieldValue.arrayRemove(chatroomId));
-        user.setChatroomsRefs(userChatrooms);
+        List<Chatroom> userChatrooms = user.chatroomsRefs;
+        userChatrooms.remove(new Chatroom(chatroomId));
+        List<GeoCage> userGeofences = user.geofencesRefs;
+        docRef.update("geofencesRefs", userGeofences);
+        user.chatroomsRefs = userChatrooms;
         preferenceManager.setUser(user);
     }
 
-    public void joinChatroom(String chatroomId) {
+    public void joinChatroom(Chatroom chatroom) {
         User user = preferenceManager.getUser();
 //       Update the database user
-        DocumentReference docRef = database.collection("users").document(user.getUsername());
-        docRef.update("chatroomsRefs", FieldValue.arrayUnion(chatroomId));
+        DocumentReference docRef = database.collection("users").document(user.username);
+        docRef.update("chatroomsRefs", FieldValue.arrayUnion(chatroom));
 //        Update the state user
-        List<String> userChatrooms = user.getChatroomsRefs();
-        userChatrooms.add(chatroomId);
-        user.setChatroomsRefs(userChatrooms);
+        List<Chatroom> userChatrooms = user.chatroomsRefs;
+        userChatrooms.add(chatroom);
+        user.chatroomsRefs = userChatrooms;
+        preferenceManager.setUser(user);
+    }
 
-        DocumentReference docGeosRef = database.collection("geofences").document(chatroomId);
-        docGeosRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        List<String> userGeos = user.getGeofencesRefs();
-                        userGeos.add((String) document.get("chatroom"));
-                        user.setGeofencesRefs(userGeos);
-                        docRef.update("geofencesRefs", FieldValue.arrayUnion(document.get("chatroom")));
-                    } else {
-                        Log.d("THIS", "No such document");
-                    }
-                } else {
-                    Log.d("THIS", "get failed with ", task.getException());
-                }
+    public Task<Void> createGeofence(GeoCage geofence) {
+        return database.collection("geofences").document(geofence.chatroomID).set(geofence).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                User user = preferenceManager.getUser();
+                DocumentReference docRef = database.collection("users").document(user.username);
+
+                user.geofencesRefs.add(geofence);
+                docRef.update("geofencesRefs", user.geofencesRefs);
+                preferenceManager.setUser(user);
             }
         });
-        preferenceManager.setUser(user);
+    }
+
+    public Task<Void> updateChatroomGeofence(GeoCage geofence, Chatroom chatroom) {
+        return database.collection("chatrooms").document(chatroom.name).update("geofence", geofence);
     }
 
 
     public Task<Void> createChatroom(Chatroom chatroom) {
-        return database.collection("chatrooms").document(chatroom.getName()).set(chatroom).addOnCompleteListener(task -> {
+        return database.collection("chatrooms").document(chatroom.name).set(chatroom).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 User user = preferenceManager.getUser();
-                DocumentReference docRef = database.collection("users").document(user.getUsername());
+                DocumentReference docRef = database.collection("users").document(user.username);
 
-                user.getChatroomsRefs().add(chatroom.getName());
-                docRef.update("chatroomsRefs", user.getChatroomsRefs());
+                user.chatroomsRefs.add(chatroom);
+                docRef.update("chatroomsRefs", user.chatroomsRefs);
                 preferenceManager.setUser(user);
             }
         });
@@ -162,15 +153,15 @@ public class FirebaseManager {
     }
 
     public void updateToken(String token) {
-        DocumentReference reference = database.collection("users").document(preferenceManager.getUser().getUsername());
+        DocumentReference reference = database.collection("users").document(preferenceManager.getUser().username);
         reference.update("fcm", token).addOnSuccessListener(v -> {
-            preferenceManager.getUser().setFCM(token);
+            preferenceManager.getUser().fcm = token;
             Log.d(TAG, "Updated FCM");
         });
     }
 
     public void clearToken() {
-        DocumentReference reference = database.collection("users").document(preferenceManager.getUser().getUsername());
+        DocumentReference reference = database.collection("users").document(preferenceManager.getUser().username);
         HashMap<String, Object> updates = new HashMap<>();
         updates.put("fcm", FieldValue.delete());
         reference.update(updates);

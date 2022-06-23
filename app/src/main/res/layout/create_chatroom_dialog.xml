@@ -28,20 +28,7 @@
             android:autofillHints="@string/chatroom_name"
             android:hint="@string/chatroom_name"
             android:inputType="text" />
-
-        <EditText
-            android:id="@+id/region"
-            android:layout_width="match_parent"
-            android:layout_height="62dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginBottom="16dp"
-            android:autofillHints="@string/chatroom_region"
-            android:fontFamily="sans-serif"
-            android:hint="@string/chatroom_region"
-            android:inputType="text" />
-
+        
         <RadioButton
             android:id="@+id/privateRadioButton"
             android:layout_width="match_parent"
