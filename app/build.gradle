@@ -55,4 +55,10 @@ dependencies {
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
+
+    //MLKit Translations
+    implementation 'com.google.mlkit:language-id:17.0.3'
+    implementation 'com.google.android.gms:play-services-mlkit-language-id:17.0.0-beta1'
+    implementation 'com.google.mlkit:translate:17.0.0'
+
 }

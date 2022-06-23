@@ -3,6 +3,9 @@ package pt.ulisboa.tecnico.cmov.conversationalist.utilities;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -16,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
+import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 
 public class FirebaseManager {
@@ -76,6 +80,7 @@ public class FirebaseManager {
         newUser.setUsername(username);
         newUser.setPassword(password);
         newUser.setChatroomsRefs(new ArrayList<String>());
+        newUser.setGeofencesRefs(new ArrayList<String>());
 
         return database.collection("users").document(username).set(newUser).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -92,6 +97,12 @@ public class FirebaseManager {
 //      Update the state user
         List<String> userChatrooms = user.getChatroomsRefs();
         userChatrooms.remove(chatroomId);
+        List<String> userGeofences = user.getGeofencesRefs();
+        if (userGeofences.contains(chatroomId)) {
+            userGeofences.remove(chatroomId);
+            user.setGeofencesRefs(userGeofences);
+        }
+        docRef.update("geofencesRefs", FieldValue.arrayRemove(chatroomId));
         user.setChatroomsRefs(userChatrooms);
         preferenceManager.setUser(user);
     }
@@ -105,6 +116,26 @@ public class FirebaseManager {
         List<String> userChatrooms = user.getChatroomsRefs();
         userChatrooms.add(chatroomId);
         user.setChatroomsRefs(userChatrooms);
+
+        DocumentReference docGeosRef = database.collection("geofences").document(chatroomId);
+        docGeosRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        List<String> userGeos = user.getGeofencesRefs();
+                        userGeos.add((String) document.get("chatroom"));
+                        user.setGeofencesRefs(userGeos);
+                        docRef.update("geofencesRefs", FieldValue.arrayUnion(document.get("chatroom")));
+                    } else {
+                        Log.d("THIS", "No such document");
+                    }
+                } else {
+                    Log.d("THIS", "get failed with ", task.getException());
+                }
+            }
+        });
         preferenceManager.setUser(user);
     }
 
@@ -118,7 +149,6 @@ public class FirebaseManager {
                 user.getChatroomsRefs().add(chatroom.getName());
                 docRef.update("chatroomsRefs", user.getChatroomsRefs());
                 preferenceManager.setUser(user);
-
             }
         });
     }
@@ -152,5 +182,12 @@ public class FirebaseManager {
 
     public Task<DocumentSnapshot> getUserInfoById(String username) {
         return database.collection("users").document(username).get();
+    }
+
+    public Task<Void> updateMessage(Message message, String language, String newTranslation) {
+        HashMap<String, Object> updates = new HashMap<>();
+        message.translations.put(language, newTranslation);
+        updates.put("translations", message.translations);
+        return database.collection("chats").document(message.id).update(updates);
     }
 }

@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.adapters.ChatAdapter;
@@ -63,11 +64,16 @@ public class ChatActivity extends BaseActivity {
             for (DocumentChange documentChange : value.getDocumentChanges()) {
                 if (documentChange.getType() == DocumentChange.Type.ADDED) {
                     Message message = new Message();
+                    message.id = documentChange.getDocument().getId();
                     message.senderId = documentChange.getDocument().getString("sender");
                     message.chatroom = documentChange.getDocument().getString("chatroom");
                     message.media = documentChange.getDocument().getString("media");
                     message.value = documentChange.getDocument().getString("value");
                     message.timestamp = documentChange.getDocument().getDate("timestamp");
+                    message.translations = (Map<String, String>) documentChange.getDocument().getData().get("translations");
+                    if (message.translations == null) {
+                        message.translations = new HashMap<>();
+                    }
                     messages.add(message);
                 }
             }
@@ -189,8 +195,6 @@ public class ChatActivity extends BaseActivity {
                 });
             }
         }
-
-
         binding.inputMessage.setText(null);
     }
 

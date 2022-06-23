@@ -2,7 +2,6 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -60,7 +59,6 @@ public class SignInActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         QuerySnapshot document = task.getResult();
                         if (document.getDocuments().size() > 0) {
-                            Log.d("POTATO", document.getDocuments().get(0).getId());
                             navigateToMainActivity();
                         } else {
                             Toast.makeText(getApplicationContext(), "Something wrong happened while creating the user", Toast.LENGTH_SHORT).show();
