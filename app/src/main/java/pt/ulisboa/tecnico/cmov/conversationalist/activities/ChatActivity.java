@@ -258,8 +258,7 @@ public class ChatActivity extends BaseActivity {
                 if (resultCode == RESULT_OK) {
                     Bundle bundle = data.getParcelableExtra("bundle");
                     LatLng latLng = bundle.getParcelable("result");
-                    sendMessage("geo", latLng.toString());
-                    Log.d("POTATO", latLng.toString());
+                    sendMessage("geo", latLng.latitude + "," + latLng.longitude);
                 }
         }
         super.onActivityResult(requestCode, resultCode, data);

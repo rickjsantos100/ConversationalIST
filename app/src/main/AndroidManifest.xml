@@ -42,6 +42,10 @@
             android:name=".activities.MapsActivity"
             android:exported="false"
             android:label="@string/title_activity_maps" />
+
+        <activity
+            android:name=".activities.NavigationMapIntent"
+            android:exported="false" />
         <activity
             android:name=".activities.SignInActivity"
             android:exported="true"
@@ -71,7 +75,7 @@
         <activity
             android:name=".activities.ChatroomActivity"
             android:exported="true"
-            android:theme="@style/Theme.ConversationalIST" >
+            android:theme="@style/Theme.ConversationalIST">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />

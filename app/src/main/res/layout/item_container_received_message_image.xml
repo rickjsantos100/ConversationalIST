@@ -47,4 +47,29 @@
         app:layout_constraintTop_toTopOf="@id/imgMessage"
         app:tint="?attr/colorOnPrimary" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/imagePos"
+        android:layout_width="200sp"
+        android:layout_height="150sp"
+        android:layout_marginStart="16sp"
+        android:layout_marginTop="12sp"
+        android:padding="5sp"
+        android:src="@drawable/ic_location"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="@id/imgMessage"
+        app:layout_constraintTop_toTopOf="@id/imgMessage"
+        app:tint="?attr/colorOnPrimary" />
+
+    <TextView
+        android:id="@+id/locationText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12sp"
+        android:layout_marginBottom="12sp"
+        android:textColor="?attr/colorOnPrimary"
+        android:textSize="8sp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imagePos" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

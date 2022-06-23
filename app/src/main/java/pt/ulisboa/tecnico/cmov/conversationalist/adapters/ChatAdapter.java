@@ -24,6 +24,7 @@ import com.google.mlkit.nl.translate.Translation;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
 
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -213,17 +214,24 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void setData(Message message) {
             this.message = message;
 
+            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));
+
             if (this.message.media.equals("geo")) {
-                binding.imagePos.setVisibility(View.VISIBLE);
-                binding.imagePos.setOnClickListener(v -> {
-                    List<String> values = Arrays.asList(message.value.split(","));
-                    if (values.size() > 2) {
-                        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + values.get(0) + "," + values.get(1));
+                List<String> values = Arrays.asList(message.value.split(","));
+                if (values.size() == 2) {
+                    binding.imagePos.setVisibility(View.VISIBLE);
+                    binding.locationText.setVisibility(View.VISIBLE);
+                    binding.locationText.setText(MessageFormat.format("({0}, {1})", values.get(0), values.get(1)));
+                    binding.imagePos.setOnClickListener(v -> {
+
+                        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + values.get(0) + "," + values.get(1) + "&mode=w");
                         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                         mapIntent.setPackage("com.google.android.apps.maps");
                         binding.getRoot().getContext().startActivity(mapIntent);
-                    }
-                });
+                    });
+                    return;
+                }
+
             }
 
             // get firebase image file reference
@@ -251,7 +259,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
 
 
-            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));
         }
     }
 
@@ -264,6 +271,26 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         void setData(Message message) {
+            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));
+
+            if (message.media.equals("geo")) {
+                List<String> values = Arrays.asList(message.value.split(","));
+                if (values.size() == 2) {
+                    binding.imagePos.setVisibility(View.VISIBLE);
+                    binding.locationText.setVisibility(View.VISIBLE);
+                    binding.locationText.setText(MessageFormat.format("({0}, {1})", values.get(0), values.get(1)));
+                    binding.imagePos.setOnClickListener(v -> {
+
+                        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + values.get(0) + "," + values.get(1) + "&mode=w");
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                        mapIntent.setPackage("com.google.android.apps.maps");
+                        binding.getRoot().getContext().startActivity(mapIntent);
+                    });
+                    return;
+                }
+
+            }
+
             // get firebase file reference
             Uri uri = Uri.parse(message.value);
             StorageReference storageReference = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com").getReference("images/" + uri.getLastPathSegment());
@@ -286,7 +313,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             .into(binding.imgMessage);
                 }
             });
-            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));
         }
     }
 

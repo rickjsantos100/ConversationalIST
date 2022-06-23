@@ -111,7 +111,7 @@ public class NavigationMapIntent extends FragmentActivity implements OnMapReadyC
         Intent returnIntent = new Intent();
         Bundle args = new Bundle();
         args.putParcelable("result", latLng);
-        returnIntent.putExtra("result", args);
+        returnIntent.putExtra("bundle", args);
         setResult(RESULT_OK, returnIntent);
         finish();
     }
