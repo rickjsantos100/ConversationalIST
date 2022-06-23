@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -126,7 +125,6 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
                 }
 
                 if (userChatroomsId.size() % 10 != 0) {
-                    Log.d("ENTREI", "trolarorororo");
                     lowerBound = userChatroomsId.size() / 10 * 10;
                     upperBound = userChatroomsId.size();
                     fetchUserChatroomsByBoundary(database, userChatroomsId, userChatrooms, lowerBound, upperBound);

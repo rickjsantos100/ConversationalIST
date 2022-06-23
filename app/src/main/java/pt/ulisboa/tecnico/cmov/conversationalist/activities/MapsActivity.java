@@ -26,12 +26,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -42,7 +36,6 @@ import java.util.Map;
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityMapsBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
-import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.GeofenceHelper;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
@@ -56,7 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ActivityMapsBinding binding;
     private GeofencingClient geoClient;
     private GeofenceHelper geoHelper;
-    private String chatroomGeofence = "DEFAULT";
+    private String chatroomGeofence;
     private float radius = 200;
 
     @Override
@@ -153,14 +146,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void tryAddingGeofence(LatLng  latLng) {
+    private void tryAddingGeofence(LatLng latLng) {
         mMap.clear();
         addMarker(latLng);
         addCircle(latLng, this.radius);
         addGeofence(latLng, this.radius, this.chatroomGeofence);
     }
 
-    @SuppressLint("MissingPermission")
     private void addGeofence(LatLng latLng, float radius, String chatroomGeofence) {
         // TODO: change geofence id
         Geofence geofence = geoHelper.getGeofence(chatroomGeofence, latLng, radius, Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT);
@@ -169,6 +161,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         PreferenceManager preferenceManager = new PreferenceManager(getApplicationContext());
 
         // permission is checked elsewhere
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // ask for permission
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+        }
         geoClient.addGeofences(geoRequest, pendingItent).addOnSuccessListener(v -> {
             Log.d(TAG, "onSuccess: Geofence added");
 

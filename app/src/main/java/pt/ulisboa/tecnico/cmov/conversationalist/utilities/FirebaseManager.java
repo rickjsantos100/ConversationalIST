@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
+import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 
 public class FirebaseManager {
@@ -181,5 +182,12 @@ public class FirebaseManager {
 
     public Task<DocumentSnapshot> getUserInfoById(String username) {
         return database.collection("users").document(username).get();
+    }
+
+    public Task<Void> updateMessage(Message message, String language, String newTranslation) {
+        HashMap<String, Object> updates = new HashMap<>();
+        message.translations.put(language, newTranslation);
+        updates.put("translations", message.translations);
+        return database.collection("chats").document(message.id).update(updates);
     }
 }

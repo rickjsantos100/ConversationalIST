@@ -33,6 +33,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyC_mBtVfPlyk1NMq2hE6bgxG5Bfbvav9PI" />
 
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="langid" />
+        <!-- To use multiple models: android:value="langid,model2,model3" -->
+
         <activity
             android:name=".activities.MapsActivity"
             android:exported="false"
