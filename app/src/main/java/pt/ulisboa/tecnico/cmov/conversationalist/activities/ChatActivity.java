@@ -1,9 +1,12 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -49,6 +53,7 @@ import retrofit2.Response;
 public class ChatActivity extends BaseActivity {
     public static final int PICKFILE_RESULT_CODE = 1;
     public static final int LAUNCH_SECOND_ACTIVITY = 1001;
+    public static final int LAUNCH_THIRD_ACTIVITY = 1002;
     private static final String TAG = "ChatActivity";
     public static HashMap<String, String> remoteMsgHeaders;
     private ActivityChatBinding binding;
@@ -260,6 +265,20 @@ public class ChatActivity extends BaseActivity {
                     LatLng latLng = bundle.getParcelable("result");
                     sendMessage("geo", latLng.latitude + "," + latLng.longitude);
                 }
+                break;
+
+            case LAUNCH_THIRD_ACTIVITY:
+                if (resultCode == RESULT_OK) {
+                    Bundle extras = data.getExtras();
+                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                    String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), imageBitmap, "temp", null);
+
+                    sendContentFile(Uri.parse(path));
+                }
+                break;
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -346,11 +365,22 @@ public class ChatActivity extends BaseActivity {
         });
         binding.layoutAttachFile.setOnClickListener(v -> chooseFile());
         binding.layoutSendLocation.setOnClickListener(v -> sendLocation());
+        binding.layoutCamera.setOnClickListener(v -> sendPhoto());
     }
 
     private void sendLocation() {
         Intent i = new Intent(this, NavigationMapIntent.class);
         startActivityForResult(i, LAUNCH_SECOND_ACTIVITY);
+    }
+
+    private void sendPhoto() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        try {
+            startActivityForResult(takePictureIntent, LAUNCH_THIRD_ACTIVITY);
+        } catch (ActivityNotFoundException e) {
+//            TODO: translate below
+            showToast("An error occurred when trying to take a picture");
+        }
     }
 
 
