@@ -1,12 +1,12 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.DialogFragment;
 
@@ -32,6 +32,9 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
     private FirebaseManager firebaseManager;
     private List<Chatroom> chatrooms;
 
+    private String sharedText;
+    private Uri sharedUri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +47,56 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
 
         setListeners();
         getChatrooms();
+
+        handleIntent();
+
     }
+
+    private void handleIntent(){
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+//                handleSendText(intent); // Handle text being sent
+                this.sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+            } else if (type.startsWith("image/") || type.startsWith("application/")) {
+//                handleSendContent(intent); // Handle single image being sent
+                this.sharedUri =  (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            }
+            binding.buttonCreate.setVisibility(View.GONE);
+        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
+            if (type.startsWith("image/") ) {
+                handleSendMultipleContents(intent); // Handle multiple images being sent
+            } else if (type.startsWith("application/")) {
+                handleSendMultipleContents(intent); // Handle multiple images being sent
+            }
+        }
+    }
+
+//    void handleSendText(Intent intent) {
+//        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+//        if (sharedText != null) {
+//            // Update UI to reflect text being shared
+//        }
+//    }
+//
+//    void handleSendContent(Intent intent) {
+//        Uri contentUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+//        if (contentUri != null) {
+//            // Update UI to reflect image being shared
+//        }
+//    }
+
+    void handleSendMultipleContents(Intent intent) {
+        ArrayList<Uri> contentUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+        if (contentUris != null) {
+            // Update UI to reflect multiple images being shared
+        }
+    }
+
+
 
     private void setListeners() {
 
@@ -105,6 +157,10 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
         firebaseManager.joinChatroom(chatroom.getName());
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra("chatroom", chatroom);
+        intent.putExtra("sharedText", this.sharedText);
+        intent.putExtra("sharedUri", this.sharedUri.toString());
+        this.sharedUri = null;
+        this.sharedText = null;
         startActivity(intent);
         finish();
     }

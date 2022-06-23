@@ -119,6 +119,14 @@ public class ChatActivity extends BaseActivity {
     private void loadRoomInfo() {
         chatroom = (Chatroom) getIntent().getSerializableExtra("chatroom");
         binding.textName.setText(chatroom.name);
+
+        String sharedText = (String) getIntent().getSerializableExtra("sharedText");
+        String sharedUri = (String) getIntent().getSerializableExtra("sharedUri");
+        if (sharedText != null){
+            binding.inputMessage.setText(sharedText);
+        } else if (sharedUri != null){
+            sendContentFile(Uri.parse(sharedUri));
+        }
     }
 
     private void getUsersOfRoom() {
@@ -235,35 +243,40 @@ public class ChatActivity extends BaseActivity {
             case PICKFILE_RESULT_CODE:
                 if (resultCode == RESULT_OK) {
                     Uri uri = data.getData();
-                    String path = uri.getPath();
-
-                    ContentResolver cR = getContentResolver();
-                    String type = cR.getType(uri);
-
-                    //storage on firebase
-                    // Create a storage reference from our app
-                    FirebaseStorage storage = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com");
-                    StorageReference storageRef = storage.getReference();
-
-                    // Create file metadata including the content type
-                    StorageMetadata metadata = new StorageMetadata.Builder()
-                            .setContentType(type)
-                            .build();
-                    UploadTask uploadTask = storageRef.child("images/" + uri.getLastPathSegment()).putFile(uri, metadata);
-
-                    // Register observers to listen for when the download is done or if it fails
-                    uploadTask.addOnFailureListener(t -> {
-                        // handle failure
-                    }).addOnSuccessListener(t -> {
-                        // handle success (add to chat)
-                        //t.getMetadata(); // contains file metadata such as size, content type
-                        // send as a message when it has been posted on the server
-                        sendMessage("image", uri.toString());
-                    });
+                    sendContentFile(uri);
                 }
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void sendContentFile(Uri uri) {
+
+        ContentResolver cR = getContentResolver();
+        String type = cR.getType(uri);
+
+        //storage on firebase
+        // Create a storage reference from our app
+        FirebaseStorage storage = FirebaseStorage.getInstance("gs://converstaionalist.appspot.com");
+        StorageReference storageRef = storage.getReference();
+
+        // Create file metadata including the content type
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentType(type)
+                .build();
+        UploadTask uploadTask = storageRef.child("images/" + uri.getLastPathSegment()).putFile(uri, metadata);
+
+        // Register observers to listen for when the download is done or if it fails
+        uploadTask.addOnFailureListener(t -> {
+            // handle failure
+//            TODO: translate below
+            showToast("Error sending file");
+        }).addOnSuccessListener(t -> {
+            // handle success (add to chat)
+            //t.getMetadata(); // contains file metadata such as size, content type
+            // send as a message when it has been posted on the server
+            sendMessage("image", uri.toString());
+        });
     }
 
     public void showMoreOptionsMenu(View view) {

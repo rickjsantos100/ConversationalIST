@@ -39,11 +39,12 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
         setContentView(binding.getRoot());
         preferenceManager = new PreferenceManager(getApplicationContext());
         firebaseManager = new FirebaseManager(getApplicationContext());
+
+        handleIntent(getIntent());
         loadUserDetails();
         setListeners();
         getUserChatrooms();
         getToken();
-        handleIntent(getIntent());
     }
 
     @Override

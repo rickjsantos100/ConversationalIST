@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
@@ -147,6 +148,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             } else {
 
                                 Uri uri = Uri.parse(message.value);
+//                                Uri uri = Uri.fromFile(new File(Uri.parse(message.value).getPath()));
 
                                 ContentResolver cR = view.getContext().getContentResolver();
                                 String type = cR.getType(uri);
@@ -240,6 +242,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             // get firebase image file reference
             Uri uri = Uri.parse(message.value);
+
 
             ContentResolver cR = binding.getRoot().getContext().getContentResolver();
             String type = cR.getType(uri);
