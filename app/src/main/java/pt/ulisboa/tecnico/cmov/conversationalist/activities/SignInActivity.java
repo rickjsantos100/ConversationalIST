@@ -20,6 +20,7 @@ public class SignInActivity extends AppCompatActivity {
     private PreferenceManager preferenceManager;
     private FirebaseManager firebaseManager;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +32,7 @@ public class SignInActivity extends AppCompatActivity {
 
         User user = preferenceManager.getUser();
         if (user == null) {
+            showCredentialsInputs();
             setListeners();
         } else {
 //            TODO: update the stored user with the most recent user information
@@ -41,6 +43,12 @@ public class SignInActivity extends AppCompatActivity {
             });
         }
     }
+
+    private void showCredentialsInputs() {
+        binding.credentialsContainer.setVisibility(View.VISIBLE);
+        binding.splashProgress.setVisibility(View.GONE);
+    }
+
 
     private void setListeners() {
         binding.textSignUp.setOnClickListener(v -> {
