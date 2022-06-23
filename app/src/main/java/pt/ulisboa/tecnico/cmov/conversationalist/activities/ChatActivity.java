@@ -4,12 +4,14 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -24,13 +26,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
@@ -48,6 +48,8 @@ import retrofit2.Response;
 
 public class ChatActivity extends BaseActivity {
     public static final int PICKFILE_RESULT_CODE = 1;
+    public static final int LAUNCH_SECOND_ACTIVITY = 1001;
+    private static final String TAG = "ChatActivity";
     public static HashMap<String, String> remoteMsgHeaders;
     private ActivityChatBinding binding;
     private FirebaseManager firebaseManager;
@@ -128,9 +130,9 @@ public class ChatActivity extends BaseActivity {
 
         String sharedText = (String) getIntent().getSerializableExtra("sharedText");
         String sharedUri = (String) getIntent().getSerializableExtra("sharedUri");
-        if (sharedText != null){
+        if (sharedText != null) {
             binding.inputMessage.setText(sharedText);
-        } else if (sharedUri != null){
+        } else if (sharedUri != null) {
             sendContentFile(Uri.parse(sharedUri));
         }
     }
@@ -210,11 +212,9 @@ public class ChatActivity extends BaseActivity {
                     try {
                         if (response.body() != null) {
                             JSONObject responseJSON = new JSONObject(response.body());
-                            JSONArray results = responseJSON.getJSONArray("results");
                             if (responseJSON.getInt("failure") == 1) {
-                                JSONObject error = (JSONObject) results.get(0);
-                                showToast(error.getString("error"));
                                 return;
+
                             }
                         }
                     } catch (JSONException e) {
@@ -222,13 +222,13 @@ public class ChatActivity extends BaseActivity {
                     }
                     showToast("Notification sent successfully");
                 } else {
-                    showToast("Error: " + response.code());
+                    Log.d(TAG, String.valueOf(response.code()));
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                showToast(t.getMessage());
+                Log.d(TAG, "Failed to create Notification");
             }
         });
     }
@@ -250,6 +250,13 @@ public class ChatActivity extends BaseActivity {
                     sendContentFile(uri);
                 }
                 break;
+            case LAUNCH_SECOND_ACTIVITY:
+                if (resultCode == RESULT_OK) {
+                    Bundle bundle = data.getParcelableExtra("bundle");
+                    LatLng latLng = bundle.getParcelable("result");
+                    sendMessage("geo", latLng.toString());
+                    Log.d("POTATO", latLng.toString());
+                }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -335,9 +342,13 @@ public class ChatActivity extends BaseActivity {
             sendMessage("text", content);
         });
         binding.layoutAttachFile.setOnClickListener(v -> chooseFile());
+        binding.layoutSendLocation.setOnClickListener(v -> sendLocation());
     }
 
-    private String parseDate(Date date) {
-        return new SimpleDateFormat("MMMM dd, yyyy - hh:mm a", Locale.getDefault()).format(date);
+    private void sendLocation() {
+        Intent i = new Intent(this, NavigationMapIntent.class);
+        startActivityForResult(i, LAUNCH_SECOND_ACTIVITY);
     }
+
+
 }

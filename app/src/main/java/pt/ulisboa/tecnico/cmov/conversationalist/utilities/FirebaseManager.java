@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.conversationalist.utilities;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -25,8 +26,10 @@ public class FirebaseManager {
 
     private final PreferenceManager preferenceManager;
     private final FirebaseFirestore database;
+    private final Context context;
 
     public FirebaseManager(Context context) {
+        this.context = context;
         preferenceManager = new PreferenceManager(context);
         database = FirebaseFirestore.getInstance();
     }
@@ -82,7 +85,7 @@ public class FirebaseManager {
 
         return database.collection("users").document(username).set(newUser).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                preferenceManager.setUser(newUser);
+                Toast.makeText(this.context, "Successfully Signed Up", Toast.LENGTH_SHORT).show();
             }
         });
     }

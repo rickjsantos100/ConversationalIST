@@ -39,7 +39,8 @@ public class SignUpActivity extends AppCompatActivity {
             fb.createUser(username, password).addOnCompleteListener(v -> {
                 loading(false);
                 if (v.isSuccessful()) {
-                    fb.getUserById(username);
+                    //fb.getUserById(username);
+                    onBackPressed();
                 }
             });
         }

@@ -56,7 +56,7 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
 
     }
 
-    private void handleIntent(){
+    private void handleIntent() {
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
@@ -67,11 +67,11 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
                 this.sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
             } else if (type.startsWith("image/") || type.startsWith("application/")) {
 //                handleSendContent(intent); // Handle single image being sent
-                this.sharedUri =  (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+                this.sharedUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
             }
             binding.buttonCreate.setVisibility(View.GONE);
         } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
-            if (type.startsWith("image/") ) {
+            if (type.startsWith("image/")) {
                 handleSendMultipleContents(intent); // Handle multiple images being sent
             } else if (type.startsWith("application/")) {
                 handleSendMultipleContents(intent); // Handle multiple images being sent
@@ -99,7 +99,6 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
             // Update UI to reflect multiple images being shared
         }
     }
-
 
 
     private void setListeners() {
@@ -151,6 +150,9 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
         for (Chatroom c : userChatroomsId) {
             userChatroomsIdString.add(c.name);
         }
+        if (userChatroomsIdString.isEmpty()) {
+            userChatroomsIdString.add("$$NOTAREALROOMONLYFORFIREBASETHIINGS$$");
+        }
         List<Chatroom> userChatrooms = new ArrayList<>();
 
         if (userChatroomsId.size() > 0) {
@@ -172,7 +174,8 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
                 fetchUserChatroomsByBoundary(database, userChatroomsIdString, userChatrooms, lowerBound, upperBound);
             }
         } else {
-//            TODO: Add message to the screen saying the user is not in any room
+            // no rooms
+            fetchUserChatroomsByBoundary(database, userChatroomsIdString, userChatrooms, 0, 1);
             loading(false);
         }
     }

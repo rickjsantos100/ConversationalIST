@@ -43,9 +43,9 @@
         android:layout_height="30sp"
         android:layout_marginTop="12sp"
         android:layout_marginEnd="16sp"
+        android:onClick="showMoreOptionsMenu"
         android:padding="4sp"
         android:src="@drawable/ic_chat_more_btn"
-        android:onClick="showMoreOptionsMenu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="?attr/colorOnPrimary" />
@@ -138,14 +138,34 @@
 
     </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/layoutSendLocation"
+        android:layout_width="40sp"
+        android:layout_height="40sp"
+        android:layout_marginBottom="12sp"
+        android:background="@drawable/ic_chat_input_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/layoutAttachFile">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="4sp"
+            android:padding="8sp"
+            android:src="@drawable/ic_location"
+            app:tint="?attr/colorOnPrimary" />
+
+    </FrameLayout>
+
     <EditText
         android:id="@+id/inputMessage"
         android:layout_width="0dp"
         android:layout_height="40sp"
         android:layout_marginStart="16sp"
-        android:layout_marginEnd="42sp"
+        android:layout_marginEnd="82sp"
         android:layout_marginBottom="12sp"
         android:background="@drawable/ic_chat_input_background"
+        android:cursorVisible="true"
         android:hint="@string/message"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
@@ -154,6 +174,7 @@
         android:paddingEnd="16sp"
         android:textColor="?attr/colorOnPrimary"
         android:textColorHint="?attr/colorSecondary"
+        android:textCursorDrawable="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/layoutSend"
         app:layout_constraintStart_toStartOf="parent" />

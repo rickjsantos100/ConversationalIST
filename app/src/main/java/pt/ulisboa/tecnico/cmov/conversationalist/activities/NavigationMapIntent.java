@@ -1,15 +1,13 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.Manifest;
-import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,40 +15,28 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityMapsBinding;
-import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
-import pt.ulisboa.tecnico.cmov.conversationalist.models.GeoCage;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
-import pt.ulisboa.tecnico.cmov.conversationalist.utilities.GeofenceHelper;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
+public class NavigationMapIntent extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
     private static final String TAG = "MapsActivity";
 
     private static final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
     private static final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
-
+    private final float radius = 200; //default value
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
-    private GeofencingClient geoClient;
-    private GeofenceHelper geoHelper;
-    private Chatroom chatroomGeofence;
     private FirebaseManager firebaseManager;
     private PreferenceManager preferenceManager;
-    private float radius = 200; //default value
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,14 +53,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
-
-        if (getIntent().getSerializableExtra("radius") != null && getIntent().getSerializableExtra("chatroomGeofence") != null) {
-            this.radius = (float) getIntent().getSerializableExtra("radius");
-            this.chatroomGeofence = (Chatroom) getIntent().getSerializableExtra("chatroomGeofence");
-        }
-
-        geoClient = LocationServices.getGeofencingClient(this);
-        geoHelper = new GeofenceHelper(this);
     }
 
     @Override
@@ -129,69 +107,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    private void addTargetLocation(LatLng latLng) {
+        Intent returnIntent = new Intent();
+        Bundle args = new Bundle();
+        args.putParcelable("result", latLng);
+        returnIntent.putExtra("result", args);
+        setResult(RESULT_OK, returnIntent);
+        finish();
+    }
+
     @Override
     public void onMapLongClick(@NonNull LatLng latLng) {
         if (Build.VERSION.SDK_INT >= 29) {
             // we need background location permission as well
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                tryAddingGeofence(latLng);
+                addTargetLocation(latLng);
             } else {
                 // request permission
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
             }
         } else {
-            tryAddingGeofence(latLng);
+            addTargetLocation(latLng);
         }
-    }
-
-    private void tryAddingGeofence(LatLng latLng) {
-        mMap.clear();
-        addMarker(latLng);
-        addCircle(latLng, this.radius);
-        addGeofence(latLng, this.radius, this.chatroomGeofence);
-    }
-
-    private void addGeofence(LatLng latLng, float radius, Chatroom chatroom) {
-        Geofence geofence = geoHelper.getGeofence(chatroomGeofence.name, latLng, radius, Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT);
-        GeofencingRequest geoRequest = geoHelper.getGeofenceRequest(geofence);
-        PendingIntent pendingItent = geoHelper.getPendingIntent();
-
-        // permission is checked elsewhere
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // ask for permission
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
-        }
-        geoClient.addGeofences(geoRequest, pendingItent).addOnSuccessListener(v -> {
-            GeoCage geo = new GeoCage();
-            geo.chatroomID = chatroom.name;
-            geo.radius = (long) radius;
-            geo.latitude = (long) latLng.latitude;
-            geo.longitude = (long) latLng.longitude;
-
-            firebaseManager.createGeofence(geo).addOnSuccessListener(t -> firebaseManager.updateChatroomGeofence(geo, chatroom).addOnSuccessListener(g -> {
-                // update chatroom as well
-                chatroom.geofence = geo;
-            }));
-            onBackPressed();
-        }).addOnFailureListener(e -> {
-            String err = geoHelper.getErrorString(e);
-            Log.d(TAG, "onFailure: " + err);
-        });
-    }
-
-    private void addMarker(LatLng latLng) {
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng);
-        mMap.addMarker(markerOptions);
-    }
-
-    private void addCircle(LatLng latLng, float radius) {
-        CircleOptions circleOptions = new CircleOptions();
-        circleOptions.center(latLng);
-        circleOptions.radius(radius);
-        circleOptions.strokeColor(Color.argb(255, 255, 0, 0));
-        circleOptions.fillColor(Color.argb(64, 255, 0, 0));
-        circleOptions.strokeWidth(4);
-        mMap.addCircle(circleOptions);
     }
 }
 
