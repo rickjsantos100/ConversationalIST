@@ -1,10 +1,12 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -75,25 +77,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         geoHelper = new GeofenceHelper(this);
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng eiffel = new LatLng(48.8589, 2.29365);
-        mMap.addMarker(new MarkerOptions().position(eiffel).title("Eiffel Tower"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eiffel, 16));
-
         enableUserLocation();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+        }
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        String locationProvider = LocationManager.NETWORK_PROVIDER;
+
+        Location currentLocation = locationManager.getLastKnownLocation(locationProvider);
+        LatLng initialPos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(initialPos).title("Initial Position"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPos, 16));
 
         mMap.setOnMapLongClickListener(this);
     }
@@ -107,17 +105,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    // permission is asked elsewhere
-    @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == FINE_LOCATION_ACCESS_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // we have permission
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+                }
                 mMap.setMyLocationEnabled(true);
-            } else {
-                // we do not have permission
             }
         }
 
