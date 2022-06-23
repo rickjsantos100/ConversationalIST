@@ -25,6 +25,8 @@ import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -195,7 +197,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void setData(Message message) {
             this.message = message;
             binding.textMessage.setText(message.value);
-            binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
+            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));;
         }
 
 
@@ -235,7 +237,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         .load(storageReference)
                         .into(binding.imgMessage);
             }
-            binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
+
+
+            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));
         }
     }
 
@@ -270,7 +274,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             .into(binding.imgMessage);
                 }
             });
-            binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
+            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));;
         }
     }
 
@@ -289,7 +293,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private void doBinding(String content, Message message) {
             binding.textMessage.setText(content);
-            binding.textDateTime.setText(message.senderId + " @ " + message.timestamp.getHours() + ":" + message.timestamp.getMinutes());
+            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));;
         }
 
 
