@@ -24,9 +24,8 @@ import com.google.mlkit.nl.translate.Translation;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -197,7 +196,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void setData(Message message) {
             this.message = message;
             binding.textMessage.setText(message.value);
-            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));;
+            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));
         }
 
 
@@ -214,7 +213,18 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void setData(Message message) {
             this.message = message;
 
-            //message.media;
+            if (this.message.media.equals("geo")) {
+                binding.imagePos.setVisibility(View.VISIBLE);
+                binding.imagePos.setOnClickListener(v -> {
+                    List<String> values = Arrays.asList(message.value.split(","));
+                    if (values.size() > 2) {
+                        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + values.get(0) + "," + values.get(1));
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                        mapIntent.setPackage("com.google.android.apps.maps");
+                        binding.getRoot().getContext().startActivity(mapIntent);
+                    }
+                });
+            }
 
             // get firebase image file reference
             Uri uri = Uri.parse(message.value);
@@ -276,7 +286,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             .into(binding.imgMessage);
                 }
             });
-            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));;
+            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));
         }
     }
 
@@ -295,7 +305,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private void doBinding(String content, Message message) {
             binding.textMessage.setText(content);
-            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));;
+            binding.textDateTime.setText(message.senderId + " @ " + new SimpleDateFormat("hh:mm dd/MM/yyyy", Locale.getDefault()).format(message.timestamp));
         }
 
 
