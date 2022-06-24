@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -68,13 +69,13 @@ public class CreateChatroomDialogFragment extends DialogFragment {
                         chatroom.adminRef = user.username;
 
                         if (name.isEmpty()) {
-//                            TODO: Stop this situation from closing the dialog
-                            binding.name.setError("Required field");
+                            Resources res = getResources();
+                            binding.name.setError(res.getString(R.string.required_field));
                         } else {
                             if (hasGeofencing) {
                                 if (TextUtils.isEmpty(radiusInput)) {
-                                    //TODO: Make this work
-                                    binding.radius.setError("Radius required when Geofencing is checked!");
+                                    Resources res = getResources();
+                                    binding.radius.setError(res.getString(R.string.radius_required_when_geofencing_is_checked));
                                 } else {
                                     radius = Float.parseFloat(radiusInput);
                                     Intent toGeoIntent = new Intent(getContext(), MapsActivity.class);
@@ -90,7 +91,8 @@ public class CreateChatroomDialogFragment extends DialogFragment {
                             }
 
                             firebaseManager.createChatroom(chatroom).addOnFailureListener(task -> {
-                                Toast.makeText(getActivity(), "Error creating chatroom", Toast.LENGTH_SHORT).show();
+                                Resources res = getResources();
+                                Toast.makeText(getActivity(), res.getString(R.string.error_creating_chatroom), Toast.LENGTH_SHORT).show();
                             });
                         }
                     }

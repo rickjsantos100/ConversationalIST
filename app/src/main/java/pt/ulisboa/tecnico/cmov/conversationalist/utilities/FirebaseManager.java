@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.utilities;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.GeoCage;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Message;
@@ -85,7 +87,8 @@ public class FirebaseManager {
 
         return database.collection("users").document(username).set(newUser).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Toast.makeText(this.context, "Successfully Signed Up", Toast.LENGTH_SHORT).show();
+                Resources res = context.getResources();
+                Toast.makeText(this.context, res.getString(R.string.successfully_signed_up), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -148,11 +151,7 @@ public class FirebaseManager {
     }
 
     public Task<DocumentSnapshot> getChatroom(String id) {
-//        TODO: manipulate result to return a Task<Chatroom>
         return database.collection("chatrooms").document(id).get();
-//                .addOnSuccessListener(documentSnapshot -> {
-//                    return documentSnapshot.toObject(Chatroom.class);
-//                });
     }
 
     public void updateToken(String token) {

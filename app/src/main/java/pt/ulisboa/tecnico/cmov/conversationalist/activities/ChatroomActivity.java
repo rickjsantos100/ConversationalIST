@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -142,7 +143,8 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
 
 
     private void showErrorMessage() {
-        binding.textErrorMessage.setText(String.format("%s", "No chatroom available"));
+        Resources res = getResources();
+        binding.textErrorMessage.setText(String.format("%s", res.getString(R.string.no_chatroom_available)));
         binding.textErrorMessage.setVisibility(View.VISIBLE);
     }
 

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
@@ -35,7 +36,6 @@ import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.GeoCage;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.GeofenceHelper;
-import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
     private static final String TAG = "MapsActivity";
@@ -49,7 +49,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GeofencingClient geoClient;
     private Chatroom chatroomGeofence;
     private FirebaseManager firebaseManager;
-    private PreferenceManager preferenceManager;
     private float radius = 200; //default value
 
     @Override
@@ -60,7 +59,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(binding.getRoot());
 
         firebaseManager = new FirebaseManager(this);
-        preferenceManager = new PreferenceManager(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -120,10 +118,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (requestCode == BACKGROUND_LOCATION_ACCESS_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // we have permission
-                Toast.makeText(this, "You can add geofences", Toast.LENGTH_SHORT).show();
+                Resources res = getResources();
+                Toast.makeText(this, res.getString(R.string.you_can_add_geofences), Toast.LENGTH_SHORT).show();
             } else {
                 // we do not have permission
-                Toast.makeText(this, "You dont have enough permissions to create a geofence", Toast.LENGTH_SHORT).show();
+                Resources res = getResources();
+                Toast.makeText(this, res.getString(R.string.no_permission_to_create_geofence), Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -222,14 +223,12 @@ public class ChatActivity extends BaseActivity {
                         if (response.body() != null) {
                             JSONObject responseJSON = new JSONObject(response.body());
                             if (responseJSON.getInt("failure") == 1) {
-                                return;
-
+                                Log.d(TAG, "Error sending the notification");
                             }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    showToast("Notification sent successfully");
                 } else {
                     Log.d(TAG, String.valueOf(response.code()));
                 }
@@ -302,12 +301,9 @@ public class ChatActivity extends BaseActivity {
         // Register observers to listen for when the download is done or if it fails
         uploadTask.addOnFailureListener(t -> {
             // handle failure
-//            TODO: translate below
-            showToast("Error sending file");
+            Resources res = getResources();
+            showToast(res.getString(R.string.error_sending_file));
         }).addOnSuccessListener(t -> {
-            // handle success (add to chat)
-            //t.getMetadata(); // contains file metadata such as size, content type
-            // send as a message when it has been posted on the server
             sendMessage("image", uri.toString());
         });
     }
@@ -345,7 +341,8 @@ public class ChatActivity extends BaseActivity {
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "ConversationalIST");
 //        TODO: translate below
-        String shareMessage = "\nJoin me in " + chatroom.name + "\n\n";
+        Resources res = getResources();
+        String shareMessage = "\n" + res.getString(R.string.join_me_in) + " " + chatroom.name + "\n\n";
 
         String shareUrl = Uri.parse("http://www.conversationalist.pt")
                 .buildUpon().appendPath("chat")
@@ -379,7 +376,8 @@ public class ChatActivity extends BaseActivity {
             startActivityForResult(takePictureIntent, LAUNCH_THIRD_ACTIVITY);
         } catch (ActivityNotFoundException e) {
 //            TODO: translate below
-            showToast("An error occurred when trying to take a picture");
+            Resources res = getResources();
+            showToast(res.getString(R.string.error_occured_when_taking_picture));
         }
     }
 
