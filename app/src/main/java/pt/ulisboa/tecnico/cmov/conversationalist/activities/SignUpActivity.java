@@ -38,7 +38,8 @@ public class SignUpActivity extends AppCompatActivity {
         String username = binding.inputUsername.getText().toString().trim();
         String password = binding.inputPassword.getText().toString().trim();
 
-        if (!username.isEmpty() && !password.isEmpty() && firebaseManager.getUserById(username) != null) {
+        if (!username.isEmpty() && !password.isEmpty() && firebaseManager.getUserInfoById(username) != null) {
+            loading(false);
             Toast.makeText(getApplicationContext(), "Username already exists, try with a different username.", Toast.LENGTH_SHORT).show();
             return;
         }
