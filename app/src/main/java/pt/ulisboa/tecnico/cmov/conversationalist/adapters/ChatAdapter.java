@@ -171,7 +171,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 //                java.lang.SecurityException: UID 10492 does not have permission to content://com.android.providers.media.documents/document/image%3A39485 [user 0]; you could obtain access using ACTION_OPEN_DOCUMENT or related APIs
 
-
                             }
                             view.getContext().startActivity(Intent.createChooser(shareIntent, "choose one"));
                             return true;
@@ -337,7 +336,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         void setData(Message message) {
             Resources res = binding.getRoot().getResources();
-            binding.textMessage.setText(res.getString(R.string.loading) + "...");
+            binding.textMessage.setText(MessageFormat.format("{0}...", res.getString(R.string.loading)));
             languageIdentifier.identifyLanguage(message.value).addOnSuccessListener(t -> {
                 String translated;
                 if (t.equals("und") && !t.equals(Locale.getDefault().getLanguage())) {

@@ -65,7 +65,8 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.Chatro
                     binding.textName.setText(chatroom.name);
                     binding.textName.setTextColor(Color.RED);
                     binding.imageChat.setText(chatroom.name);
-                    binding.textOther.setText("Can't access room...");
+                    Resources res = binding.getRoot().getResources();
+                    binding.textOther.setText(res.getString(R.string.cant_access_room));
                     return;
                 }
             }

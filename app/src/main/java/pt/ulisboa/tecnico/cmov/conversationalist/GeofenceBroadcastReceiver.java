@@ -3,12 +3,12 @@ package pt.ulisboa.tecnico.cmov.conversationalist;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -42,11 +42,12 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
         int transitionType = geofencingEvent.getGeofenceTransition();
 
+        Resources res = context.getResources();
         // deal with events here
         switch (transitionType) {
             case Geofence.GEOFENCE_TRANSITION_ENTER:
-                Toast.makeText(context, "Geofence enter", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("Geofence", "Entered Geofence", MapsActivity.class);
+                Toast.makeText(context, res.getString(R.string.entered_geofence), Toast.LENGTH_SHORT).show();
+                notificationHelper.sendHighPriorityNotification("Geofence", res.getString(R.string.entered_geofence), MapsActivity.class);
 
                 for (Geofence currentGeo : geos) {
                     firebaseManager.getChatroom(currentGeo.getRequestId()).addOnSuccessListener(documentSnapshot -> {
@@ -59,14 +60,13 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                             }
                             triggeringGeofences.add(currentGeo.getRequestId());
                             preferenceManager.setTriggeringGeofences(triggeringGeofences);
-                            db.collection("users").document(currentUser.username).update("activeGeofences", FieldValue.arrayUnion(currentGeo.getRequestId()));
                         }
                     });
                 }
                 break;
             case Geofence.GEOFENCE_TRANSITION_EXIT:
-                Toast.makeText(context, "Geofence exit", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("Geofence", "Exited Geofence", MapsActivity.class);
+                Toast.makeText(context, res.getString(R.string.geofence_exit), Toast.LENGTH_SHORT).show();
+                notificationHelper.sendHighPriorityNotification("Geofence", res.getString(R.string.entered_geofence), MapsActivity.class);
 
                 for (Geofence currentGeo : geos) {
                     firebaseManager.getChatroom(currentGeo.getRequestId()).addOnSuccessListener(documentSnapshot -> {
@@ -78,7 +78,6 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                                 triggeringGeofences.remove(currentGeo.getRequestId());
                                 preferenceManager.setTriggeringGeofences(triggeringGeofences);
                             }
-                            db.collection("users").document(currentUser.username).update("activeGeofences", FieldValue.arrayRemove(currentGeo.getRequestId()));
                         }
                     });
                 }

@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.activities;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.QuerySnapshot;
 
+import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivitySignInBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
@@ -35,7 +37,6 @@ public class SignInActivity extends AppCompatActivity {
             showCredentialsInputs();
             setListeners();
         } else {
-//            TODO: update the stored user with the most recent user information
             firebaseManager.getUserById(user.username).addOnCompleteListener(task -> {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -58,8 +59,8 @@ public class SignInActivity extends AppCompatActivity {
             String username = binding.inputUsername.getText().toString().trim();
             String password = binding.inputPassword.getText().toString().trim();
             if (username.isEmpty() || password.isEmpty()) {
-                //                                TODO: change below line to use translations
-                Toast.makeText(getApplicationContext(), "Confirm Inputs", Toast.LENGTH_SHORT).show();
+                Resources res = getResources();
+                Toast.makeText(getApplicationContext(), res.getString(R.string.confirm_inputs), Toast.LENGTH_SHORT).show();
             } else {
                 loading(true);
                 firebaseManager.getUserIfPasswordMatches(username, password).addOnCompleteListener(task -> {
@@ -69,7 +70,8 @@ public class SignInActivity extends AppCompatActivity {
                         if (document.getDocuments().size() > 0) {
                             navigateToMainActivity();
                         } else {
-                            Toast.makeText(getApplicationContext(), "Something wrong happened with the log in", Toast.LENGTH_SHORT).show();
+                            Resources res = getResources();
+                            Toast.makeText(getApplicationContext(), res.getString(R.string.something_went_wrong_with_log_in), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

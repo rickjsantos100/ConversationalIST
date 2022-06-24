@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/leaveChatroom"
-        android:title="Leave chatroom" />
+        android:title="@string/leave_chatroom" />
     <item
         android:id="@+id/shareChatroom"
-        android:title="Share chatroom" />
+        android:title="@string/share_chatroom" />
 </menu>

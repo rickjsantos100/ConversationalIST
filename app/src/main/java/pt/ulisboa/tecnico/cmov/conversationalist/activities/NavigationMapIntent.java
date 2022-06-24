@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -24,19 +25,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ActivityMapsBinding;
-import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
-import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class NavigationMapIntent extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
-    private static final String TAG = "MapsActivity";
+    private static final String TAG = "NavigationMapIntent";
 
     private static final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
     private static final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
-    private final float radius = 200; //default value
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
-    private FirebaseManager firebaseManager;
-    private PreferenceManager preferenceManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +40,6 @@ public class NavigationMapIntent extends FragmentActivity implements OnMapReadyC
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        firebaseManager = new FirebaseManager(this);
-        preferenceManager = new PreferenceManager(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -68,7 +61,8 @@ public class NavigationMapIntent extends FragmentActivity implements OnMapReadyC
 
         Location currentLocation = locationManager.getLastKnownLocation(locationProvider);
         LatLng initialPos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(initialPos).title("Initial Position"));
+        Resources res = getResources();
+        mMap.addMarker(new MarkerOptions().position(initialPos).title(res.getString(R.string.initial_pos)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPos, 16));
 
         mMap.setOnMapLongClickListener(this);
@@ -99,10 +93,12 @@ public class NavigationMapIntent extends FragmentActivity implements OnMapReadyC
         if (requestCode == BACKGROUND_LOCATION_ACCESS_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // we have permission
-                Toast.makeText(this, "You can add geofences", Toast.LENGTH_SHORT).show();
+                Resources res = getResources();
+                Toast.makeText(this, res.getString(R.string.you_can_add_geofences), Toast.LENGTH_SHORT).show();
             } else {
                 // we do not have permission
-                Toast.makeText(this, "You dont have enough permissions to create a geofence", Toast.LENGTH_SHORT).show();
+                Resources res = getResources();
+                Toast.makeText(this, res.getString(R.string.no_permission_to_create_geofence), Toast.LENGTH_SHORT).show();
             }
         }
     }

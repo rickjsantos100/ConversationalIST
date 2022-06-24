@@ -25,5 +25,25 @@
     <string name="password">Palavra-Passe</string>
     <string name="sign_in">Faça Sign In</string>
     <string name="loading">Carregando</string>
-    <string name="is_not_private">Não é Privado</string>
+    <string name="is_not_private">Publico</string>
+    <string name="confirm_inputs">Confirme Inserção</string>
+    <string name="something_went_wrong_with_log_in">Algo aconteceu com o LogIn</string>
+    <string name="error_sending_file">Erro ao enviar ficheiro</string>
+    <string name="join_me_in">Junta-te comigo em</string>
+    <string name="error_occured_when_taking_picture">Ocorreu um erro quando tirou a foto</string>
+    <string name="no_chatroom_available">Nenhuma sala disponível</string>
+    <string name="signing_out">Fazendo Signout</string>
+    <string name="you_can_add_geofences">Pode adicionar Geofences</string>
+    <string name="no_permission_to_create_geofence">Não tem permissões para criar uma Geofence</string>
+    <string name="cant_access_room">Sem acesso à sala</string>
+    <string name="initial_pos">Posição Inicial</string>
+    <string name="required_field">Campo Obrigatório</string>
+    <string name="radius_required_when_geofencing_is_checked">Raio obrigatório</string>
+    <string name="error_creating_chatroom">Error ao criar a Sala</string>
+    <string name="successfully_signed_up">Signup com sucesso</string>
+    <string name="entered_geofence">Entrou na Geofence</string>
+    <string name="geofence_exit">Saiu da Geofence</string>
+    <string name="leave_chatroom">Sair da Sala</string>
+    <string name="share_chatroom">Partilhar Sala</string>
+    <string name="share">Partilha</string>
 </resources>
