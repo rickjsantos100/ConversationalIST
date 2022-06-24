@@ -163,7 +163,7 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
         intent.putExtra("chatroom", chatroom);
         intent.putExtra("sharedText", this.sharedText);
-        intent.putExtra("sharedUri", this.sharedUri);
+        intent.putExtra("sharedUri", this.sharedUri.toString());
         this.sharedUri = null;
         this.sharedText = null;
         startActivity(intent);

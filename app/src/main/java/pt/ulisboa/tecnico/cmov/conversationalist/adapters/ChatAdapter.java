@@ -254,6 +254,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
             } else {
                 binding.imagePDF.setVisibility(View.INVISIBLE);
+                binding.downloadIcon.setVisibility(View.VISIBLE);
 
                 ConnectivityManager connMgr = (ConnectivityManager) binding.getRoot().getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
                 if(connMgr.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI){
@@ -321,6 +322,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     });
                 } else {
                     binding.imagePDF.setVisibility(View.INVISIBLE);
+                    binding.downloadIcon.setVisibility(View.VISIBLE);
+
 
                     ConnectivityManager connMgr = (ConnectivityManager) binding.getRoot().getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
                     if(connMgr.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI){

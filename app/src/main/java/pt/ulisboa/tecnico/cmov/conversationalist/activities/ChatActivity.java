@@ -136,14 +136,11 @@ public class ChatActivity extends BaseActivity {
         binding.textName.setText(chatroom.name);
 
         String sharedText = (String) getIntent().getSerializableExtra("sharedText");
-        Uri sharedUriDirty = (Uri) getIntent().getSerializableExtra("sharedUri");
-        String sharedUri = "";
-        if (sharedUriDirty != null) {
-            sharedUri = sharedUriDirty.toString();
-        }
+        String sharedUri = (String) getIntent().getSerializableExtra("sharedUri");
+
         if (sharedText != null) {
             binding.inputMessage.setText(sharedText);
-        } else if (!sharedUri.equals("")) {
+        } else if (sharedUri != null && !sharedUri.equals("")) {
             sendContentFile(Uri.parse(sharedUri));
         }
     }

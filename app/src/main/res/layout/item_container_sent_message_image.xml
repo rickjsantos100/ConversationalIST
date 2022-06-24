@@ -29,6 +29,7 @@
         android:id="@+id/downloadIcon"
         android:layout_width="200sp"
         android:layout_height="180sp"
+        android:visibility="gone"
         android:background="@drawable/ic_chat_input_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/imgMessage"
