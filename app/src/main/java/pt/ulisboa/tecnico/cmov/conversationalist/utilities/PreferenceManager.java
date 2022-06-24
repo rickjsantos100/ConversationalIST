@@ -3,7 +3,12 @@ package pt.ulisboa.tecnico.cmov.conversationalist.utilities;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.android.gms.location.Geofence;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
 
@@ -56,6 +61,18 @@ public class PreferenceManager {
         putString("user", serialized_user);
     }
 
+    public List<Geofence> getGeofences() {
+        Type geofencesListType = new TypeToken<List<Geofence>>() {}.getType();
+        Gson gson = new Gson();
+        return gson.fromJson(getString("geofences"), geofencesListType);
+    }
+
+    public void setGeofences(List<Geofence> geofences) {
+        Type geofencesListType = new TypeToken<List<Geofence>>() {}.getType();
+        Gson gson = new Gson();
+        String serializedGeofences = gson.toJson(geofences, geofencesListType);
+        putString("geofences", serializedGeofences);
+    }
     public void clear() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
