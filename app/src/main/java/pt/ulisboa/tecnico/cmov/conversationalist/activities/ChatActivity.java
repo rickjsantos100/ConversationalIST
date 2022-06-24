@@ -128,6 +128,7 @@ public class ChatActivity extends BaseActivity {
         loadRoomInfo();
         listenMessages();
         getUsersOfRoom();
+        preferenceManager.putString("currentChatroom", chatroom.name);
     }
 
     private void loadRoomInfo() {
@@ -333,6 +334,7 @@ public class ChatActivity extends BaseActivity {
 
     private void leaveChatroom() {
         firebaseManager.leaveChatroom(chatroom.name);
+        preferenceManager.putString("currentChatroom", null);
         onBackPressed();
     }
 
@@ -355,7 +357,10 @@ public class ChatActivity extends BaseActivity {
     }
 
     private void setListeners() {
-        binding.imageBack.setOnClickListener(v -> onBackPressed());
+        binding.imageBack.setOnClickListener(v -> {
+            preferenceManager.putString("currentChatroom", null);
+            onBackPressed();
+        });
         binding.layoutSend.setOnClickListener(v -> {
             String content = binding.inputMessage.getText().toString().trim();
             sendMessage("text", content);

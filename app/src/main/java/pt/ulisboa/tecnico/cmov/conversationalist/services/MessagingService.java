@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -20,10 +21,14 @@ import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.activities.ChatActivity;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.User;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.FirebaseManager;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class MessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "FCM";
+    private static PreferenceManager preferenceManager;
+    private static FirebaseManager firebaseManager;
 
     @Override
     public void onNewToken(@NonNull String token) {
@@ -34,6 +39,8 @@ public class MessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
+        preferenceManager = new PreferenceManager(getApplicationContext());
+        firebaseManager = new FirebaseManager(getApplicationContext());
         User user = new User();
         user.username = message.getData().get("username");
         user.fcm = message.getData().get("fcm");
@@ -69,5 +76,25 @@ public class MessagingService extends FirebaseMessagingService {
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(notificationId, builder.build());
+
+        User currentUser = preferenceManager.getUser();
+        String currentChatroomRef = preferenceManager.getString("currentChatroom");
+
+        firebaseManager.getUserById(currentUser.username).addOnCompleteListener(v -> {
+            if (v.isSuccessful()) {
+                try {
+                    Long isOnline = v.getResult().getLong("online");
+
+                    if (isOnline != null && isOnline == 1) {
+                        if (currentChatroomRef != null && currentChatroomRef.equals(chatroom.name)) {
+                            String toastInfo = user.username + " @ " + chatroom.name + ": " + message.getData().get("message");
+                            Toast.makeText(getApplicationContext(), toastInfo, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                } catch (Exception e) {
+                    //showToast(e.getMessage());
+                }
+            }
+        });
     }
 }
