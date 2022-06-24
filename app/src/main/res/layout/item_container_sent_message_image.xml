@@ -12,6 +12,7 @@
         android:layout_height="180sp"
         android:background="@drawable/chat_sent_message_background"
         android:contentDescription="@string/sent_image"
+
         android:maxHeight="30sp"
         android:paddingStart="12sp"
         android:paddingTop="8dp"
@@ -23,6 +24,29 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="wrap"
         app:layout_constraintWidth_percent="0.8" />
+
+    <FrameLayout
+        android:id="@+id/downloadIcon"
+        android:layout_width="200sp"
+        android:layout_height="180sp"
+        android:background="@drawable/ic_chat_input_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/imgMessage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="wrap"
+
+        app:layout_constraintWidth_percent="0.8">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="4sp"
+            android:padding="8sp"
+            android:src="@drawable/ic_baseline_cloud_download_24"
+            app:tint="?attr/colorOnPrimary" />
+
+    </FrameLayout>
+
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imagePDF"

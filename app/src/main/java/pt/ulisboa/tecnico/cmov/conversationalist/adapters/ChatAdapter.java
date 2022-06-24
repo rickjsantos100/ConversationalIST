@@ -1,8 +1,10 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.adapters;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -253,9 +255,21 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
             } else {
                 binding.imagePDF.setVisibility(View.INVISIBLE);
-                Glide.with(binding.getRoot())
-                        .load(storageReference)
-                        .into(binding.imgMessage);
+
+                ConnectivityManager connMgr = (ConnectivityManager) binding.getRoot().getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                if(connMgr.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI){
+                    binding.downloadIcon.setVisibility(View.GONE);
+                    Glide.with(binding.getRoot())
+                            .load(storageReference)
+                            .into(binding.imgMessage);
+                } else {
+                    binding.downloadIcon.setOnClickListener(t -> {
+                        binding.downloadIcon.setVisibility(View.GONE);
+                        Glide.with(binding.getRoot())
+                                .load(storageReference)
+                                .into(binding.imgMessage);
+                    });
+                }
             }
 
 
@@ -308,9 +322,21 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     });
                 } else {
                     binding.imagePDF.setVisibility(View.INVISIBLE);
-                    Glide.with(binding.getRoot())
-                            .load(storageReference)
-                            .into(binding.imgMessage);
+
+                    ConnectivityManager connMgr = (ConnectivityManager) binding.getRoot().getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                    if(connMgr.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI){
+                        binding.downloadIcon.setVisibility(View.GONE);
+                        Glide.with(binding.getRoot())
+                                .load(storageReference)
+                                .into(binding.imgMessage);
+                    } else {
+                        binding.downloadIcon.setOnClickListener(t -> {
+                            binding.downloadIcon.setVisibility(View.GONE);
+                            Glide.with(binding.getRoot())
+                                    .load(storageReference)
+                                    .into(binding.imgMessage);
+                        });
+                    }
                 }
             });
         }

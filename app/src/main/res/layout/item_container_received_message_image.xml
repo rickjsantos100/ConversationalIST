@@ -24,6 +24,27 @@
         app:layout_constraintWidth_max="wrap"
         app:layout_constraintWidth_percent="0.75" />
 
+    <FrameLayout
+        android:id="@+id/downloadIcon"
+        android:layout_width="200sp"
+        android:layout_height="180sp"
+        android:background="@drawable/ic_chat_input_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="wrap"
+        app:layout_constraintWidth_percent="0.75" >
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="4sp"
+            android:padding="8sp"
+            android:src="@drawable/ic_baseline_cloud_download_24"
+            android:background = "@color/ist_blue"
+            app:tint="?attr/colorOnPrimary" />
+
+    </FrameLayout>
+
     <TextView
         android:id="@+id/textDateTime"
         android:layout_width="0dp"
@@ -46,6 +67,7 @@
         app:layout_constraintStart_toStartOf="@id/imgMessage"
         app:layout_constraintTop_toTopOf="@id/imgMessage"
         app:tint="?attr/colorOnPrimary" />
+
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/imagePos"
