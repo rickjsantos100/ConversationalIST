@@ -62,17 +62,35 @@ public class PreferenceManager {
     }
 
     public List<Geofence> getGeofences() {
-        Type geofencesListType = new TypeToken<List<Geofence>>() {}.getType();
+        Type geofencesListType = new TypeToken<List<Geofence>>() {
+        }.getType();
         Gson gson = new Gson();
         return gson.fromJson(getString("geofences"), geofencesListType);
     }
 
     public void setGeofences(List<Geofence> geofences) {
-        Type geofencesListType = new TypeToken<List<Geofence>>() {}.getType();
+        Type geofencesListType = new TypeToken<List<Geofence>>() {
+        }.getType();
         Gson gson = new Gson();
         String serializedGeofences = gson.toJson(geofences, geofencesListType);
         putString("geofences", serializedGeofences);
     }
+
+    public List<String> getTriggeringGeofences() {
+        Type stringsListType = new TypeToken<List<String>>() {
+        }.getType();
+        Gson gson = new Gson();
+        return gson.fromJson(getString("localGeofences"), stringsListType);
+    }
+
+    public void setTriggeringGeofences(List<String> localGeofences) {
+        Type stringsListType = new TypeToken<List<String>>() {
+        }.getType();
+        Gson gson = new Gson();
+        String serializedLocalGeofences = gson.toJson(localGeofences, stringsListType);
+        putString("localGeofences", serializedLocalGeofences);
+    }
+
     public void clear() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();

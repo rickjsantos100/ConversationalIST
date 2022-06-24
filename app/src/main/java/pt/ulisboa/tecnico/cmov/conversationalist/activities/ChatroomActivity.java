@@ -56,6 +56,12 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getChatrooms();
+    }
+
     private void handleIntent() {
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -78,20 +84,6 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
             }
         }
     }
-
-//    void handleSendText(Intent intent) {
-//        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-//        if (sharedText != null) {
-//            // Update UI to reflect text being shared
-//        }
-//    }
-//
-//    void handleSendContent(Intent intent) {
-//        Uri contentUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
-//        if (contentUri != null) {
-//            // Update UI to reflect image being shared
-//        }
-//    }
 
     void handleSendMultipleContents(Intent intent) {
         ArrayList<Uri> contentUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
@@ -118,14 +110,8 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
                     loading(false);
                     if (task.isSuccessful() && task.getResult() != null) {
                         for (QueryDocumentSnapshot q : task.getResult()) {
-                            Chatroom chatroom = new Chatroom();
-                            chatroom.name = q.getId();
-                            if (q.get("radius") != null) {
-                                chatroom.radius = q.getDouble("radius").floatValue();
-                            }
-                            chatroom.isPrivate = Boolean.TRUE.equals(q.getBoolean("isPrivate")) || Boolean.TRUE.equals(q.getBoolean("private"));
-                            chatroom.adminRef = q.getString("admingRef");
-                            if (!chatroom.isPrivate) {
+                            Chatroom chatroom = q.toObject(Chatroom.class);
+                            if (chatroom.isPrivate != null && !chatroom.isPrivate) {
                                 userChatrooms.add(chatroom);
                             }
                         }

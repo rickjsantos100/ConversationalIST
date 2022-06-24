@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.conversationalist.adapters;
 
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -13,6 +14,7 @@ import pt.ulisboa.tecnico.cmov.conversationalist.R;
 import pt.ulisboa.tecnico.cmov.conversationalist.databinding.ItemContainerChatroomBinding;
 import pt.ulisboa.tecnico.cmov.conversationalist.listeners.ChatroomListener;
 import pt.ulisboa.tecnico.cmov.conversationalist.models.Chatroom;
+import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ChatroomViewHolder> {
 
@@ -49,16 +51,26 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.Chatro
     class ChatroomViewHolder extends RecyclerView.ViewHolder {
 
         ItemContainerChatroomBinding binding;
+        PreferenceManager preferenceManager;
 
         ChatroomViewHolder(ItemContainerChatroomBinding itemContainerChatroomBinding) {
             super(itemContainerChatroomBinding.getRoot());
             binding = itemContainerChatroomBinding;
+            preferenceManager = new PreferenceManager(binding.getRoot().getContext());
         }
 
         void setChatroomData(Chatroom chatroom) {
+            if (chatroom.radius != null) {
+                if (preferenceManager.getTriggeringGeofences() == null || (preferenceManager.getTriggeringGeofences() != null && !preferenceManager.getTriggeringGeofences().contains(chatroom.name))) {
+                    binding.textName.setText(chatroom.name);
+                    binding.textName.setTextColor(Color.RED);
+                    binding.imageChat.setText(chatroom.name);
+                    binding.textOther.setText("Can't access room...");
+                    return;
+                }
+            }
             binding.textName.setText(chatroom.name);
             binding.imageChat.setText(chatroom.name);
-            // maybe add other things like private here
             Resources res = binding.getRoot().getResources();
             binding.textOther.setText(chatroom.isPrivate ? res.getString(R.string.is_private) : res.getString(R.string.is_not_private));
 

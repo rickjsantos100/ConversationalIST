@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -33,11 +34,10 @@ import pt.ulisboa.tecnico.cmov.conversationalist.utilities.PreferenceManager;
 
 public class MainActivity extends BaseActivity implements ChatroomListener {
 
+    private static final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
     private ActivityMainBinding binding;
     private PreferenceManager preferenceManager;
     private FirebaseManager firebaseManager;
-    private static final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
-    private GeofencingClient geoClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,12 +129,19 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
     private void setUserGeofences() {
         List<GeoCage> userGeocages = preferenceManager.getUser().geofencesRefs;
         List<Geofence> userGeofences = new ArrayList<>();
-        GeofenceHelper geofenceHelper = new GeofenceHelper(getApplicationContext());
+        GeofenceHelper geofenceHelper = new GeofenceHelper(this);
+        GeofencingClient geoClient = LocationServices.getGeofencingClient(this);
+
+        // permission is checked elsewhere
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // ask for permission
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+        }
 
         for (GeoCage geoCage : userGeocages) {
             String geoChatroomId = geoCage.chatroomID;
-            Long geoLatitude = geoCage.latitude;
-            Long geoLongitude = geoCage.longitude;
+            Double geoLatitude = geoCage.latitude;
+            Double geoLongitude = geoCage.longitude;
             LatLng geoLatLng = new LatLng(geoLatitude, geoLongitude);
             Long radius = geoCage.radius;
 
@@ -142,12 +149,6 @@ public class MainActivity extends BaseActivity implements ChatroomListener {
             GeofencingRequest geofencingRequest = geofenceHelper.getGeofenceRequest(geofence);
             PendingIntent pendingIntent = geofenceHelper.getPendingIntent();
             userGeofences.add(geofence);
-
-            // permission is checked elsewhere
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // ask for permission
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
-            }
 
             geoClient.addGeofences(geofencingRequest, pendingIntent);
         }

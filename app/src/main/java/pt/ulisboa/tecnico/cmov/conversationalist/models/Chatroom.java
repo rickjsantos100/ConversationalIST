@@ -5,9 +5,9 @@ import java.io.Serializable;
 public class Chatroom implements Serializable {
 
     public String name;
-    public boolean isPrivate;
+    public Boolean isPrivate;
     public String adminRef;
-    public float radius;
+    public Float radius;
     public GeoCage geofence;
 
     public Chatroom() {

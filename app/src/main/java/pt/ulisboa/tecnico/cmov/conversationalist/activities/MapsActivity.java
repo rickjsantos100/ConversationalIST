@@ -45,8 +45,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
-    private GeofencingClient geoClient;
     private GeofenceHelper geoHelper;
+    private GeofencingClient geoClient;
     private Chatroom chatroomGeofence;
     private FirebaseManager firebaseManager;
     private PreferenceManager preferenceManager;
@@ -73,8 +73,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             this.chatroomGeofence = (Chatroom) getIntent().getSerializableExtra("chatroomGeofence");
         }
 
-        geoClient = LocationServices.getGeofencingClient(this);
         geoHelper = new GeofenceHelper(this);
+        geoClient = LocationServices.getGeofencingClient(this);
     }
 
     @Override
@@ -90,7 +90,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Location currentLocation = locationManager.getLastKnownLocation(locationProvider);
         LatLng initialPos = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(initialPos).title("Initial Position"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPos, 16));
 
         mMap.setOnMapLongClickListener(this);
@@ -148,29 +147,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.clear();
         addMarker(latLng);
         addCircle(latLng, this.radius);
-        addGeofence(latLng, this.radius, this.chatroomGeofence);
+        addGeofence(latLng, this.radius);
     }
 
-    private void addGeofence(LatLng latLng, float radius, Chatroom chatroom) {
-        Geofence geofence = geoHelper.getGeofence(chatroomGeofence.name, latLng, radius, Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT);
+    private void addGeofence(LatLng latLng, float radius) {
+        Geofence geofence = geoHelper.getGeofence(this.chatroomGeofence.name, latLng, radius, Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT);
         GeofencingRequest geoRequest = geoHelper.getGeofenceRequest(geofence);
         PendingIntent pendingItent = geoHelper.getPendingIntent();
 
-        // permission is checked elsewhere
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // ask for permission
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
         }
         geoClient.addGeofences(geoRequest, pendingItent).addOnSuccessListener(v -> {
             GeoCage geo = new GeoCage();
-            geo.chatroomID = chatroom.name;
+            geo.chatroomID = this.chatroomGeofence.name;
             geo.radius = (long) radius;
-            geo.latitude = (long) latLng.latitude;
-            geo.longitude = (long) latLng.longitude;
+            geo.latitude = latLng.latitude;
+            geo.longitude = latLng.longitude;
 
-            firebaseManager.createGeofence(geo).addOnSuccessListener(t -> firebaseManager.updateChatroomGeofence(geo, chatroom).addOnSuccessListener(g -> {
+            firebaseManager.createGeofence(geo).addOnSuccessListener(t -> firebaseManager.updateChatroomGeofence(geo, this.chatroomGeofence).addOnSuccessListener(g -> {
                 // update chatroom as well
-                chatroom.geofence = geo;
+                this.chatroomGeofence.geofence = geo;
             }));
             onBackPressed();
         }).addOnFailureListener(e -> {
