@@ -50,7 +50,6 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
         this.chatrooms = new ArrayList<>();
 
         setListeners();
-        getChatrooms();
 
         handleIntent();
 
@@ -102,33 +101,8 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
         });
     }
 
-    private void fetchUserChatroomsByBoundary(FirebaseFirestore database, List<String> userChatroomsId, List<Chatroom> userChatrooms, int lowerBound, int upperBound) {
-        database.collection("chatrooms")
-                .whereNotIn(FieldPath.documentId(), userChatroomsId.subList(lowerBound, upperBound))
-                .get()
-                .addOnCompleteListener(task -> {
-                    loading(false);
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        for (QueryDocumentSnapshot q : task.getResult()) {
-                            Chatroom chatroom = q.toObject(Chatroom.class);
-                            if (chatroom.isPrivate != null && !chatroom.isPrivate) {
-                                userChatrooms.add(chatroom);
-                            }
-                        }
-                        if (userChatrooms.size() > 0) {
-                            ChatroomAdapter chatroomAdapter = new ChatroomAdapter(userChatrooms, this);
-                            binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
-                            binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
-                        } else {
-                            showErrorMessage();
-                        }
-                    } else {
-                        showErrorMessage();
-                    }
-                });
-    }
-
     private void getChatrooms() {
+        chatrooms = new ArrayList<Chatroom>();
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         List<Chatroom> userChatroomsId = preferenceManager.getUser().chatroomsRefs;
@@ -139,31 +113,31 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
         if (userChatroomsIdString.isEmpty()) {
             userChatroomsIdString.add("$$NOTAREALROOMONLYFORFIREBASETHIINGS$$");
         }
-        List<Chatroom> userChatrooms = new ArrayList<>();
 
-        if (userChatroomsId.size() > 0) {
-            int lowerBound = 0;
-            int upperBound = userChatroomsId.size();
-            if (userChatroomsId.size() > 10) {
-                for (int i = 0; i < userChatroomsId.size() / 10; i++) {
-                    lowerBound = i * 10;
-                    upperBound = lowerBound + 10;
-                    fetchUserChatroomsByBoundary(database, userChatroomsIdString, userChatrooms, lowerBound, upperBound);
-                }
 
-                if (userChatroomsId.size() % 10 != 0) {
-                    lowerBound = userChatroomsId.size() / 10 * 10;
-                    upperBound = userChatroomsId.size();
-                    fetchUserChatroomsByBoundary(database, userChatroomsIdString, userChatrooms, lowerBound, upperBound);
-                }
-            } else {
-                fetchUserChatroomsByBoundary(database, userChatroomsIdString, userChatrooms, lowerBound, upperBound);
-            }
-        } else {
-            // no rooms
-            fetchUserChatroomsByBoundary(database, userChatroomsIdString, userChatrooms, 0, 1);
-            loading(false);
-        }
+        database.collection("chatrooms")
+                .get()
+                .addOnCompleteListener(task -> {
+                    loading(false);
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        for (QueryDocumentSnapshot q : task.getResult()) {
+                            Chatroom chatroom = q.toObject(Chatroom.class);
+                            if (chatroom.isPrivate != null && !chatroom.isPrivate) {
+                                chatrooms.add(chatroom);
+                            }
+                        }
+                        if (chatrooms.size() > 0) {
+                            ChatroomAdapter chatroomAdapter = new ChatroomAdapter(chatrooms, this);
+                            binding.chatroomsRecycleView.setAdapter(chatroomAdapter);
+                            binding.chatroomsRecycleView.setVisibility(View.VISIBLE);
+                        } else {
+                            showErrorMessage();
+                        }
+                    } else {
+                        showErrorMessage();
+                    }
+                });
+
     }
 
 
@@ -212,13 +186,17 @@ public class ChatroomActivity extends BaseActivity implements ChatroomListener {
             @Override
             public boolean onQueryTextChange(String s) {
                 List<Chatroom> filteredChatrooms;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    filteredChatrooms = chatrooms.stream().filter(o -> o.name.startsWith(s)).collect(Collectors.toList());
-                } else {
-                    filteredChatrooms = new ArrayList<>();
-                    for (Chatroom c : chatrooms) {
-                        if (c.name.startsWith(s)) {
-                            filteredChatrooms.add(c);
+                if (s.equals("")) {
+                    filteredChatrooms = chatrooms;
+                }else {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        filteredChatrooms = chatrooms.stream().filter(o -> o.name.toLowerCase().startsWith(s.toLowerCase())).collect(Collectors.toList());
+                    } else {
+                        filteredChatrooms = new ArrayList<>();
+                        for (Chatroom c : chatrooms) {
+                            if (c.name.toLowerCase().startsWith(s.toLowerCase())) {
+                                filteredChatrooms.add(c);
+                            }
                         }
                     }
                 }
